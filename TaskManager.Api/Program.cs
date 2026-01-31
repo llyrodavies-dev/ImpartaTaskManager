@@ -1,4 +1,8 @@
 
+using Microsoft.Extensions.Options;
+using TaskManager.Infrastructure;
+using TaskManager.Infrastructure.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,7 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "TaskManager API",
+        Version = "v1",
+        Description = "API for managing tasks and jobs"
+    });
+});
 
 builder.Services.AddCors(options =>
 {
@@ -17,8 +28,13 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
+// Add Infrastructure services
+DependencyInjection.AddInfrastructure(builder.Services,builder.Configuration);
 
 var app = builder.Build();
+
+// Apply migrations and seed data
+await app.InitializeDatabaseAsync();
 
 app.UseCors("frontend");
 
