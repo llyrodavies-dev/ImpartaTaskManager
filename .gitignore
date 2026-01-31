@@ -1,0 +1,13 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+.vscode/
+
+# Node
+node_modules/
+dist/
+.env
+.DS_Store
