@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaskManager.Domain.Common;
+﻿using TaskManager.Domain.Common;
+using TaskManager.Domain.Enums;
 
 namespace TaskManager.Domain.Entities
 {
@@ -11,6 +7,7 @@ namespace TaskManager.Domain.Entities
     {
         public Guid UserId { get; private set; }
         public string Title { get; private set; } = string.Empty;
+        public JobStatus Status { get; private set; } = JobStatus.NotStarted;
 
         private readonly List<TaskItem> _tasks = [];
         public IReadOnlyCollection<TaskItem> Tasks => _tasks;
@@ -29,6 +26,18 @@ namespace TaskManager.Domain.Entities
         {
             var task = new TaskItem(Id, title, description, createdBy);
             _tasks.Add(task);
+        }
+
+        public void UpdateTitle(string title, string modifiedBy)
+        {
+            Title = title;
+            SetModified(modifiedBy);
+        }
+
+        public void UpdateStatus(JobStatus status, string modifiedBy)
+        {
+            Status = status;
+            SetModified(modifiedBy);
         }
     }
 }

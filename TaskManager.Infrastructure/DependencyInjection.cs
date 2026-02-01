@@ -43,12 +43,17 @@ namespace TaskManager.Infrastructure
                 };
             });
 
+            // HTTP Context Accessor
+            services.AddHttpContextAccessor();
+
             // Applicaiton layer interfaces
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             // Domain layer interfaces
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IJobRepository, JobRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             // Infrastructure layer interfaces

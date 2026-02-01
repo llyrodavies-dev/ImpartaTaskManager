@@ -14,19 +14,19 @@ export default function SignIn() {
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const loginCommand: LoginCommand = { email, password };
-    const result = await api.post('auth/login', loginCommand);
-    if (handleApiResponse(result)) {
-      console.error('Login failed:', result);
-      return;
-    }
+        const loginCommand: LoginCommand = { email, password };
+        const result = await api.post('auth/login', loginCommand);
+        if (handleApiResponse(result)) {
+        console.error('Login failed:', result);
+        return;
+        }
 
-    console.log('Login success:', result);
-    setAuth(result);
-    navigate('/dashboard');
-};
+        console.log('Login success:', result);
+        setAuth(result);
+        navigate('/dashboard');
+    };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">

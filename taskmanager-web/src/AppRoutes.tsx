@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
+import Jobs from './pages/Jobs';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function AppRoutes() {
@@ -14,6 +15,11 @@ export default function AppRoutes() {
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/jobs" element={
+        <ProtectedRoute>
+          <Jobs />
         </ProtectedRoute>
       } />
     </Routes>
