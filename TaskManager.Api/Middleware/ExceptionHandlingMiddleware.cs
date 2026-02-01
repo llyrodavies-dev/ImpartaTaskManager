@@ -82,11 +82,11 @@ namespace TaskManager.Api.Middleware
 
             return new
             {
-                type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                title = "One or more validation errors occurred.",
-                status = 400,
-                errors,
-                instance = context.Request.Path.ToString()
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Title = "One or more validation errors occurred.",
+                Status = 400,
+                Errors = errors,
+                Instance = context.Request.Path.ToString()
             };
         }
     }
