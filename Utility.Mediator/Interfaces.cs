@@ -14,6 +14,7 @@
 public interface IMediator
 {
     Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
+    Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification;
 }
 
 /// <summary>
@@ -46,4 +47,20 @@ public interface IRequestHandler<TRequest, TResponse> where TRequest : IRequest<
 public interface IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
     Task<TResponse> Handle(TRequest request, Func<Task<TResponse>> next, CancellationToken cancellationToken);
+}
+
+/// <summary>
+/// Marker interface for notifications that can be published to multiple handlers.
+/// </summary>
+public interface INotification
+{
+}
+
+/// <summary>
+/// Handler for notifications. Multiple handlers can handle the same notification.
+/// </summary>
+/// <typeparam name="TNotification">The type of notification to handle.</typeparam>
+public interface INotificationHandler<in TNotification> where TNotification : INotification
+{
+    Task Handle(TNotification notification, CancellationToken cancellationToken = default);
 }

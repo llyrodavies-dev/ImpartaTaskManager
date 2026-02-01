@@ -37,9 +37,6 @@ namespace TaskManager.Api.Middleware
                 FluentValidation.ValidationException validationEx =>
                     (HttpStatusCode.BadRequest, CreateValidationErrorResponse(validationEx, context)),
 
-                ApplicationException domain =>
-                    (HttpStatusCode.BadRequest, CreateProblemDetails(HttpStatusCode.BadRequest, "Business Rule Violation", domain.Message, context)),
-
                 AuthenticationException auth =>
                     (HttpStatusCode.Unauthorized, CreateProblemDetails(HttpStatusCode.Unauthorized, "Authentication Failed", auth.Message, context)),
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Utility.Mediator
 {
@@ -34,14 +33,41 @@ namespace Utility.Mediator
 
             if (behaviorList != null)
             {
-                foreach (dynamic behavior in behaviorList.Reverse())
+                foreach (dynamic? behavior in behaviorList.Reverse())
                 {
+                    if(behavior == null) continue;
                     Func<Task<TResponse>> next = handlerDelegate;
                     handlerDelegate = () => behavior.Handle((dynamic)request, next, cancellationToken);
                 }
             }
 
             return await handlerDelegate();
+        }
+
+        /// <summary>
+        /// Publishes a notification to all registered handlers.
+        /// </summary>
+        public async Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+            where TNotification : INotification
+        {
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
+            Type notificationType = notification.GetType();
+            Type handlerType = typeof(INotificationHandler<>).MakeGenericType(notificationType);
+
+            // Get all handlers for this notification
+            var handlers = _serviceProvider.GetServices(handlerType).Cast<dynamic>();
+
+            // Execute all handlers concurrently
+            var tasks = new List<Task>();
+            foreach (dynamic handler in handlers)
+            {
+                tasks.Add(handler.Handle((dynamic)notification, cancellationToken));
+            }
+
+            // Wait for all handlers to complete
+            await Task.WhenAll(tasks);
         }
     }
 }

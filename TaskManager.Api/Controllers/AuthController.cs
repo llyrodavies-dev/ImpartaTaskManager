@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManager.Application.Common.Models;
 using TaskManager.Application.Features.Auth.Commands;
 using Utility.Mediator;
@@ -28,6 +29,21 @@ namespace TaskManager.Api.Controllers
         {
             AuthResult result = await _mediator.Send(command);
             return Ok(result);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPost("revoke")]
+        public async Task<IActionResult> RevokeToken([FromBody] RevokeTokenCommand command)
+        {
+            await _mediator.Send(command);
+            return NoContent();
         }
     }
 }

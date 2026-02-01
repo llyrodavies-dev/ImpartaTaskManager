@@ -16,9 +16,11 @@ namespace Utility.Mediator
             services.AddScoped<IMediator, Mediator>();
 
             Type hanlerInterfaceType = typeof(IRequestHandler<,>);
+            Type notificationHandlerInterfaceType = typeof(INotificationHandler<>);
 
             foreach (Assembly assembly in assemblies)
             {
+                // Register request handlers
                 var handlerTypes = assembly
                     .GetTypes()
                     .Where(type => !type.IsAbstract && !type.IsInterface)
@@ -30,9 +32,21 @@ namespace Utility.Mediator
                 {
                     services.AddTransient(handler.Interface, handler.implementation);
                 }
+
+                // Register notification handlers
+                var notificationHandlerTypes = assembly
+                    .GetTypes()
+                    .Where(type => !type.IsAbstract && !type.IsInterface)
+                    .SelectMany(type => type.GetInterfaces()
+                        .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == notificationHandlerInterfaceType)
+                        .Select(i => new { Interface = i, Implementation = type }));
+
+                foreach (var handler in notificationHandlerTypes)
+                {
+                    services.AddScoped(handler.Interface, handler.Implementation);
+                }
             }
 
-            // Implementation for adding mediator with assemblies
             return services;
         }
     }

@@ -4,6 +4,8 @@ using System.Security.Authentication;
 using TaskManager.Application.Common.Interfaces;
 using TaskManager.Application.Common.Models;
 using TaskManager.Application.Features.Auth.Commands;
+using TaskManager.Domain.Entities;
+using TaskManager.Domain.Interfaces;
 using TaskManager.Infrastructure.Interfaces;
 
 namespace TaskManager.Infrastructure.Identity
@@ -13,12 +15,16 @@ namespace TaskManager.Infrastructure.Identity
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenService _tokenService;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService)
+        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService, IRefreshTokenRepository refreshTokenRepository, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _refreshTokenRepository = refreshTokenRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> UserExistsAsync(string email, CancellationToken cancellationToken = default)
@@ -51,12 +57,20 @@ namespace TaskManager.Infrastructure.Identity
             await _userManager.AddToRoleAsync(newUser, "User");
 
             var token = _tokenService.GenerateToken(newUser);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            var refreshTokenEntity = new RefreshToken(refreshToken, newUser.Id, refreshTokenExpiry, "system");
+            await _refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new AuthResult
             {
                 Token = token,
                 Email = newUser.Email!,
-                UserId = newUser.Id
+                UserId = newUser.Id,
+                RefreshToken = token,
+                RefreshTokenExpiry = refreshTokenExpiry
             };
         }
 
@@ -69,13 +83,64 @@ namespace TaskManager.Infrastructure.Identity
                 throw new AuthenticationException("Invalid credentials");
 
             var token = _tokenService.GenerateToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            var refreshTokenEntity = new RefreshToken(refreshToken, user.Id, refreshTokenExpiry, user.Email!);
+            await _refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new AuthResult
             {
                 Token = token,
                 Email = user.Email!,
-                UserId = user.Id
+                UserId = user.Id,
+                RefreshToken = token,
+                RefreshTokenExpiry = refreshTokenExpiry
             };
+        }
+
+        public async Task<AuthResult> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+        {
+            var storedToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken, cancellationToken)
+                ?? throw new AuthenticationException("Invalid refresh token");
+
+            if (!storedToken.IsActive)
+                throw new AuthenticationException("Refresh token is expired or revoked");
+
+            var user = await _userManager.FindByIdAsync(storedToken.UserId.ToString())
+                ?? throw new AuthenticationException("User not found");
+
+            // Revoke old token
+            storedToken.Revoke(user.Email!);
+
+            // Generate new tokens
+            var newAccessToken = _tokenService.GenerateToken(user);
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+            var newRefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            // Store new refresh token
+            var newRefreshTokenEntity = new RefreshToken(newRefreshToken, user.Id, newRefreshTokenExpiry, user.Email!);
+            await _refreshTokenRepository.AddAsync(newRefreshTokenEntity, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return new AuthResult
+            {
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken,
+                Email = user.Email!,
+                UserId = user.Id,
+                RefreshTokenExpiry = newRefreshTokenExpiry
+            };
+        }
+
+        public async Task RevokeTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+        {
+            var storedToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken, cancellationToken)
+                ?? throw new AuthenticationException("Invalid refresh token");
+
+            storedToken.Revoke("system");
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 }
