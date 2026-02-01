@@ -6,16 +6,11 @@ using TaskManager.Infrastructure.Identity;
 
 namespace TaskManager.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
     {
         public DbSet<User> DomainUsers => Set<User>();
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
