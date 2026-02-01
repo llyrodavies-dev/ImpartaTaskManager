@@ -31,7 +31,7 @@ namespace TaskManager.Application.Features.Jobs.DTOs
 
         public static List<JobDto> FromDomainList(List<Job> jobs)
         {
-            return jobs.Select(FromDomain).ToList();
+            return [.. jobs.Select(FromDomain)];
         }
     }
 }

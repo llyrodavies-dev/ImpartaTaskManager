@@ -19,6 +19,7 @@ export default function Navbar() {
       {isLoggedIn ? (
         <>
           <Link to="/dashboard" className="text-white mr-4 hover:text-blue-300">Dashboard</Link>
+          <Link to="/jobs" className="text-white mr-4 hover:text-blue-300">Jobs</Link>
           <button onClick={handleSignOut} className="text-white hover:text-red-400">Sign Out</button>
         </>
       ) : (
