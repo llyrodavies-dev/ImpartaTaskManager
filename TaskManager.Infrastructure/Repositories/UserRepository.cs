@@ -1,4 +1,5 @@
-﻿using TaskManager.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Domain.Entities;
 using TaskManager.Domain.Interfaces;
 using TaskManager.Infrastructure.Persistence;
 
@@ -16,6 +17,11 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _dbContext.FindAsync<User>(email);
+        }
+
+        public async Task<User?> GetUserByIdentityUserId(Guid identityUserId)
+        {
+            return await _dbContext.DomainUsers.FirstOrDefaultAsync(x => x.IdentityUserId == identityUserId);
         }
 
         public async Task AddUserAsync(User user, CancellationToken cancellationToken = default)
