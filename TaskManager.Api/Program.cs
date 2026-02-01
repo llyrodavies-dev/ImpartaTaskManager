@@ -1,5 +1,7 @@
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using TaskManager.Api.Middleware;
+using TaskManager.Application;
 using TaskManager.Infrastructure;
 using TaskManager.Infrastructure.Extensions;
 using Utility.Mediator;
@@ -53,8 +55,9 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
-// Add Infrastructure services
-DependencyInjection.AddInfrastructure(builder.Services, builder.Configuration);
+// Add Infrastructure and Application services
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 // Add Mediator
 Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies()
@@ -68,6 +71,9 @@ var app = builder.Build();
 
 // Apply migrations and seed data
 await app.InitializeDatabaseAsync();
+
+// Add middleware for exception handling
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors("frontend");
 

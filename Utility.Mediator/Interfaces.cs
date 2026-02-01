@@ -45,5 +45,5 @@ public interface IRequestHandler<TRequest, TResponse> where TRequest : IRequest<
 /// <typeparam name="TResponse">The type of the response returned by the request handler.</typeparam>
 public interface IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
-    Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
+    Task<TResponse> Handle(TRequest request, Func<Task<TResponse>> next, CancellationToken cancellationToken);
 }

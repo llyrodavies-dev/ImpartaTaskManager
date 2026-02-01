@@ -28,7 +28,7 @@ namespace Utility.Mediator
 
             var pipelineBehaviouType = typeof(IPipelineBehavior<,>).MakeGenericType(request.GetType(), typeof(TResponse));
 
-            IEnumerable<object?> behaviorList = _serviceProvider.GetServices(typeof(IEnumerable<>).MakeGenericType(pipelineBehaviouType));
+            IEnumerable<object?> behaviorList = _serviceProvider.GetServices(pipelineBehaviouType).Reverse().Cast<dynamic>();
 
             Func<Task<TResponse>> handlerDelegate = () => handler.Handle((dynamic)request, cancellationToken);
 
@@ -37,7 +37,7 @@ namespace Utility.Mediator
                 foreach (dynamic behavior in behaviorList.Reverse())
                 {
                     Func<Task<TResponse>> next = handlerDelegate;
-                    handlerDelegate = () => behavior.Handle((dynamic)request, cancellationToken, next);
+                    handlerDelegate = () => behavior.Handle((dynamic)request, next, cancellationToken);
                 }
             }
 
