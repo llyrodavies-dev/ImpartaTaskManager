@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TaskManager.Application.Features.Auth.Commands;
+using TaskManager.Api.Contracts;
+using TaskManager.Application.Features.Jobs.Commands;
 using TaskManager.Application.Features.Jobs.Query;
+using TaskManager.Application.Features.Tasks.Commands;
+using TaskManager.Application.Features.Tasks.DTOs;
 using Utility.Mediator;
 
 namespace TaskManager.Api.Controllers
@@ -17,12 +20,6 @@ namespace TaskManager.Api.Controllers
         {
             _mediator = mediator;
         }
-        // create endpoits for the following actions:
-        //GET    /api/jobs
-        //GET    /api/jobs/{id}
-        //POST   /api/jobs
-        //POST   /api/jobs/{id}/ tasks
-        //PUT    /api/jobs/{ id}
 
         [HttpGet]
         public async Task<IActionResult> Login()
@@ -30,5 +27,34 @@ namespace TaskManager.Api.Controllers
             return Ok(await _mediator.Send(new JobsQuery()));
         }
 
+        [HttpGet]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> GetJobById(Guid id)
+        {
+            return Ok(await _mediator.Send(new JobDetailsQuery(id)));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateJob([FromBody] CreateJobCommand command)
+        {
+            return Ok(await _mediator.Send(command));
+        }
+
+        [HttpPost]
+        [Route("{id:guid}/tasks")]
+        public async Task<IActionResult> AddTaskToJob(Guid id, [FromBody] CreateTaskRequest request)
+        {
+            CreateTaskCommand command = new(id, request.Title, request.Description);
+            TaskItemDto task = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetJobById), new { id }, task);
+        }
+
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> UpdateJob(Guid id)
+        {
+            // Implementation for updating a job
+            return Ok();
+        }
     }
 }

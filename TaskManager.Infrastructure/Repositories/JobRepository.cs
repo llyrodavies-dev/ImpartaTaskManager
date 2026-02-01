@@ -28,5 +28,17 @@ namespace TaskManager.Infrastructure.Repositories
 
             return (await query.ToListAsync(cancellationToken), totalCount);
         }
+
+        public async Task<Job?> GetJobByIdAndTasksAsync(Guid jobId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Jobs
+                .Include(j => j.Tasks)
+                .FirstOrDefaultAsync(j => j.Id == jobId, cancellationToken);
+        }
+
+        public async Task AddAsync(Job newJob, CancellationToken cancellationToken)
+        {
+            await _dbContext.Jobs.AddAsync(newJob, cancellationToken);
+        }
     }
 }
