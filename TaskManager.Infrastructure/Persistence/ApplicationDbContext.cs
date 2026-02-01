@@ -11,6 +11,7 @@ namespace TaskManager.Infrastructure.Persistence
         public DbSet<User> DomainUsers => Set<User>();
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

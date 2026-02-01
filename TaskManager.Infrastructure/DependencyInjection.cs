@@ -49,6 +49,7 @@ namespace TaskManager.Infrastructure
             // Domain layer interfaces
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             // Infrastructure layer interfaces
             services.AddScoped<ITokenService, TokenService>();

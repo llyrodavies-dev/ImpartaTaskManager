@@ -17,6 +17,7 @@ namespace TaskManager.Api.Controllers
             _mediator = mediator;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginCommand command)
         {
@@ -24,6 +25,7 @@ namespace TaskManager.Api.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterCommand command)
         {
