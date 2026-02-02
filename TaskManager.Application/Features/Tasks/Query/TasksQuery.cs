@@ -4,5 +4,5 @@ using Utility.Mediator;
 
 namespace TaskManager.Application.Features.Tasks.Query
 {
-    public class TasksQuery : IRequest<PagedResponse<TaskItemDto>>;
+    public class TasksQuery : FilterRequest, IRequest<PagedResponse<TaskItemDto>>;
 }

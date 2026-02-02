@@ -49,6 +49,7 @@ namespace TaskManager.Infrastructure
             // Applicaiton layer interfaces
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 
             // Domain layer interfaces
             services.AddScoped<IUnitOfWork, UnitOfWork>();

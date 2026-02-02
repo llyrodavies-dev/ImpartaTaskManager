@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TaskManager.Domain\TaskManager.Domain.csproj" />
+    <ProjectReference Include="..\Utility.Filtering\Utility.Filtering.csproj" />
     <ProjectReference Include="..\Utility.Mediator\Utility.Mediator.csproj" />
   </ItemGroup>
 

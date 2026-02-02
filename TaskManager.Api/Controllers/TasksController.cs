@@ -17,10 +17,10 @@ namespace TaskManager.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllTasks()
+        [HttpPost("search")]
+        public async Task<IActionResult> GetAllTasks([FromBody] TasksQuery query)
         {
-            return Ok(await _mediator.Send(new TasksQuery()));
+            return Ok(await _mediator.Send(query));
         }
 
         [HttpPut]
