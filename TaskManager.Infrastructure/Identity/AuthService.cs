@@ -56,7 +56,7 @@ namespace TaskManager.Infrastructure.Identity
 
             await _userManager.AddToRoleAsync(newUser, "User");
 
-            var token = _tokenService.GenerateToken(newUser);
+            (string token, DateTime tokenExpiry) = _tokenService.GenerateToken(newUser);
             var refreshToken = _tokenService.GenerateRefreshToken();
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
@@ -67,9 +67,10 @@ namespace TaskManager.Infrastructure.Identity
             return new AuthResult
             {
                 Token = token,
+                TokenExpiry = tokenExpiry,
                 Email = newUser.Email!,
                 UserId = newUser.Id,
-                RefreshToken = token,
+                RefreshToken = refreshToken,
                 RefreshTokenExpiry = refreshTokenExpiry
             };
         }
@@ -82,7 +83,7 @@ namespace TaskManager.Infrastructure.Identity
             if (!result.Succeeded)
                 throw new AuthenticationException("Invalid credentials");
 
-            var token = _tokenService.GenerateToken(user);
+            (string token, DateTime tokenExpiry) = _tokenService.GenerateToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
@@ -93,9 +94,10 @@ namespace TaskManager.Infrastructure.Identity
             return new AuthResult
             {
                 Token = token,
+                TokenExpiry = tokenExpiry,
                 Email = user.Email!,
                 UserId = user.Id,
-                RefreshToken = token,
+                RefreshToken = refreshToken,
                 RefreshTokenExpiry = refreshTokenExpiry
             };
         }
@@ -115,7 +117,7 @@ namespace TaskManager.Infrastructure.Identity
             storedToken.Revoke(user.Email!);
 
             // Generate new tokens
-            var newAccessToken = _tokenService.GenerateToken(user);
+            (string newAccessToken, DateTime tokenExpiry) = _tokenService.GenerateToken(user);
             var newRefreshToken = _tokenService.GenerateRefreshToken();
             var newRefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
@@ -127,6 +129,7 @@ namespace TaskManager.Infrastructure.Identity
             return new AuthResult
             {
                 Token = newAccessToken,
+                TokenExpiry = tokenExpiry,
                 RefreshToken = newRefreshToken,
                 Email = user.Email!,
                 UserId = user.Id,

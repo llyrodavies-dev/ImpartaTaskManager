@@ -4,7 +4,7 @@ namespace TaskManager.Infrastructure.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(ApplicationUser user);
+        (string, DateTime) GenerateToken(ApplicationUser user);
         string GenerateRefreshToken();
     }
 }

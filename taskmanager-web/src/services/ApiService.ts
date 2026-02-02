@@ -1,3 +1,4 @@
+import { getAuth, setAuth, clearAuth } from '../utils/authStorage';
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface ApiOptions {
@@ -9,12 +10,46 @@ export interface ApiOptions {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7114/api/';
 
 async function apiRequest<T = any>( path: string, method: HttpMethod = 'GET', options: ApiOptions = {} ): Promise<T> {
+
+  let auth = getAuth();
+  const tokenExpiry = auth.tokenExpiry;
+  const refreshToken = auth.refreshToken;
+  const refreshTokenExpiry = auth.refreshTokenExpiry;
+
+  console.log('API Request - tokenExpiry:', tokenExpiry, 'refreshToken:', refreshToken, 'refreshTokenExpiry:', refreshTokenExpiry);
+  // Check if token is expired
+  if (tokenExpiry && new Date(tokenExpiry) <= new Date()) {
+    // Check if refresh token is still valid
+    if (refreshToken && refreshTokenExpiry && new Date(refreshTokenExpiry) > new Date()) {
+      // Attempt to refresh token
+      const refreshResponse = await fetch(`${API_BASE_URL}auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (refreshResponse.ok) {
+        const newAuth = await refreshResponse.json();
+        setAuth(newAuth);
+        auth = newAuth;
+      } else {
+        // Refresh failed, clear auth and throw error
+        clearAuth();
+        throw new Error('Session expired. Please log in again.');
+      }
+    } else {
+      // No valid refresh token, clear auth and throw error
+      clearAuth();
+      throw new Error('Session expired. Please log in again.');
+    }
+  }
+
   const { headers, body, params } = options;
   const url = buildUrl(path, params);
   const response = await fetch(url, {
     method,
     headers: {
       'Content-Type': 'application/json',
+      ...(auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
       ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,

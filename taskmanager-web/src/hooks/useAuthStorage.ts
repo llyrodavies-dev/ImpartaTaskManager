@@ -1,27 +1,12 @@
+
 import { useCallback } from 'react';
 import type { AuthResult } from '../models/AuthResult';
-
-const AUTH_KEY = 'auth';
+import { getAuth as getAuthStorage, setAuth as setAuthStorage, clearAuth as clearAuthStorage } from '../utils/authStorage';
 
 export function useAuthStorage() {
-  // Store the entire AuthResult object in localStorage
-  const setAuth = useCallback((auth: AuthResult) => {
-    localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
-  }, []);
-
-  const getAuth = useCallback((): Partial<AuthResult> => {
-    const raw = localStorage.getItem(AUTH_KEY);
-    if (!raw) return {};
-    try {
-      return JSON.parse(raw) as AuthResult;
-    } catch {
-      return {};
-    }
-  }, []);
-
-  const clearAuth = useCallback(() => {
-    localStorage.removeItem(AUTH_KEY);
-  }, []);
-
+  // Use shared utility functions, wrapped in useCallback for stable references
+  const setAuth = useCallback((auth: AuthResult) => setAuthStorage(auth), []);
+  const getAuth = useCallback((): Partial<AuthResult> => getAuthStorage(), []);
+  const clearAuth = useCallback(() => clearAuthStorage(), []);
   return { setAuth, getAuth, clearAuth };
 }

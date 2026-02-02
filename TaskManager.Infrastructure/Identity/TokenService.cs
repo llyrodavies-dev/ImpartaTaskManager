@@ -17,32 +17,34 @@ namespace TaskManager.Infrastructure.Identity
             _configuration = configuration;
         }
 
-        public string GenerateToken(ApplicationUser user)
+        public (string, DateTime) GenerateToken(ApplicationUser user)
         {
-            var claims = new List<Claim>
+            List<Claim> claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Email, user.Email!),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
+            DateTime expiryTime = DateTime.UtcNow.AddMinutes(15); // TODO: set up to be configurable
+
+            JwtSecurityToken token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15), // TODO: set up to be configurable
+                expires: expiryTime,
                 signingCredentials: credentials
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return (new JwtSecurityTokenHandler().WriteToken(token), expiryTime);
         }
 
         public string GenerateRefreshToken()
         {
-            var randomNumber = new byte[64];
-            using var rng = RandomNumberGenerator.Create();
+            byte[] randomNumber = new byte[64];
+            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
