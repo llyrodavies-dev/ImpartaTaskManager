@@ -5,6 +5,7 @@ import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
 import Jobs from './pages/Jobs';
 import ProtectedRoute from './components/ProtectedRoute';
+import JobDetails from './pages/JobDetails';
 
 export default function AppRoutes() {
   return (
@@ -12,16 +13,11 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/signIn" element={<SignIn />} />
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/jobs" element={
-        <ProtectedRoute>
-          <Jobs />
-        </ProtectedRoute>
-      } />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs/:id" element={<JobDetails />} />
+      </Route>
     </Routes>
   );
 }

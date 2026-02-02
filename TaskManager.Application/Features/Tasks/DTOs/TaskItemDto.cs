@@ -1,4 +1,5 @@
-﻿using TaskManager.Domain.Entities;
+﻿using TaskManager.Application.Features.Jobs.DTOs;
+using TaskManager.Domain.Entities;
 using TaskManager.Domain.Enums;
 
 namespace TaskManager.Application.Features.Tasks.DTOs
@@ -30,6 +31,11 @@ namespace TaskManager.Application.Features.Tasks.DTOs
                 ModifiedAtUtc = task.ModifiedAtUtc,
                 ModifiedBy = task.ModifiedBy
             };
+        }
+
+        public static List<TaskItemDto> FromDomainList(List<TaskItem> tasks)
+        {
+            return [.. tasks.Select(FromDomain)];
         }
     }
 }

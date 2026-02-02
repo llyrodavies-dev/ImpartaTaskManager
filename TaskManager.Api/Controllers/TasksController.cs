@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.Application.Features.Tasks.Query;
 using Utility.Mediator;
 
 namespace TaskManager.Api.Controllers
@@ -19,8 +20,7 @@ namespace TaskManager.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTasks()
         {
-            // Implementation for getting all tasks
-            return Ok();
+            return Ok(await _mediator.Send(new TasksQuery()));
         }
 
         [HttpPut]
@@ -33,7 +33,7 @@ namespace TaskManager.Api.Controllers
 
         [HttpPatch]
         [Route("{id}/status")]
-        public async Task<IActionResult> UpdateTaskStatus(Guid id)
+        public async Task<IActionResult> UpdateTaskStatus(Guid id, TaskStatus taskStatus)
         {
             // Implementation for updating task status
             return Ok();

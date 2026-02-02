@@ -19,5 +19,11 @@ namespace TaskManager.Domain.Entities
             Description = description;
             SetCreated(createdBy);
         }
+
+        public void UpdateStatus(TaskItemStatus status, string modifiedBy)
+        {
+            Status = status;
+            SetModified(modifiedBy);
+        }
     }
 }

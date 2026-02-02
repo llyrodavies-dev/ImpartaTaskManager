@@ -16,12 +16,15 @@ namespace TaskManager.Infrastructure.Repositories
 
         public async Task<List<Job>> GetAllJobsAsync(Guid UserId, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Jobs.Where(x=>x.UserId == UserId).ToListAsync(cancellationToken);
+            return await _dbContext.Jobs
+                .AsNoTracking()
+                .Where(x=>x.UserId == UserId).ToListAsync(cancellationToken);
         }
 
         public async Task<(List<Job>, int)> GetJobsByUserIdPagedAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Jobs
+                .AsNoTracking()
                 .Where(j => j.UserId == userId);
 
             var totalCount = await query.CountAsync(cancellationToken);
@@ -32,6 +35,7 @@ namespace TaskManager.Infrastructure.Repositories
         public async Task<Job?> GetJobByIdAndTasksAsync(Guid jobId, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Jobs
+                .AsNoTracking()
                 .Include(j => j.Tasks)
                 .FirstOrDefaultAsync(j => j.Id == jobId, cancellationToken);
         }

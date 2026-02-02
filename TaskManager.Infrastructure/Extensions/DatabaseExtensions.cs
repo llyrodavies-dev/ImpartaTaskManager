@@ -64,11 +64,36 @@ namespace TaskManager.Infrastructure.Extensions
 
                     // Seed Jobs for the user
                     var job1 = new Job(domainUser.Id, "Setup Development Environment", "system");
-                    var job2 = new Job(domainUser.Id, "Complete API Documentation", "system");
-
                     job1.UpdateStatus(JobStatus.InProgress, "Ali");
+                    job1.AddTask("Install Visual Studio", "Download and install Visual Studio 2022", "system");
+                    job1.AddTask("Setup Git", "Configure Git with SSH keys", "system");
+                    job1.AddTask("Clone Repository", "Clone the project repository from GitHub", "system");
+                    job1.AddTask("Install Dependencies", "Run npm install and restore NuGet packages", "system");
+
                     await dbContext.Jobs.AddAsync(job1);
+                    await dbContext.SaveChangesAsync();
+
+                    var job2 = new Job(domainUser.Id, "Complete API Documentation", "system");
+                    job2.AddTask("Document Authentication Endpoints", "Add Swagger documentation for auth endpoints", "system");
+                    job2.AddTask("Document Job Endpoints", "Add Swagger documentation for job endpoints", "system");
+                    job2.AddTask("Document Task Endpoints", "Add Swagger documentation for task endpoints", "system");
+                    job2.AddTask("Create API Examples", "Add example requests and responses", "system");
+                    job2.AddTask("Review Documentation", "Peer review of all API documentation", "system");
+
                     await dbContext.Jobs.AddAsync(job2);
+                    await dbContext.SaveChangesAsync();
+
+                    // Update task statuses for job2
+                    var job2Tasks = job2.Tasks.ToList();
+                    if (job2Tasks.Count >= 5)
+                    {
+                        job2Tasks[0].UpdateStatus(TaskItemStatus.Completed, "Ali");      // Auth Docs - Completed
+                        job2Tasks[1].UpdateStatus(TaskItemStatus.InProgress, "Ali");     // Job Docs - In Progress
+                        job2Tasks[2].UpdateStatus(TaskItemStatus.Blocked, "Ali");        // Task Docs - Blocked
+                        job2Tasks[3].UpdateStatus(TaskItemStatus.NotStarted, "Ali");     // Examples - Not Started
+                        job2Tasks[4].UpdateStatus(TaskItemStatus.NotStarted, "Ali");     // Review - Not Started
+                    }
+
                     await dbContext.SaveChangesAsync();
                 }
             }

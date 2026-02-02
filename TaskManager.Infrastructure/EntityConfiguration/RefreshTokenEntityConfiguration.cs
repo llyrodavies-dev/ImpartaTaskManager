@@ -1,16 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManager.Domain.Entities;
 
 namespace TaskManager.Infrastructure.EntityConfiguration
 {
     public class RefreshTokenEntityConfiguration : IEntityTypeConfiguration<RefreshToken>
     {
-        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<RefreshToken> builder)
+        public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
             builder.ToTable("RefreshTokens");
             builder.HasKey(rt => rt.Id);
