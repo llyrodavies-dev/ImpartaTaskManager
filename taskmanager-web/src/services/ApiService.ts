@@ -16,7 +16,7 @@ async function apiRequest<T = any>( path: string, method: HttpMethod = 'GET', op
   const refreshToken = auth.refreshToken;
   const refreshTokenExpiry = auth.refreshTokenExpiry;
 
-  console.log('API Request - tokenExpiry:', tokenExpiry, 'refreshToken:', refreshToken, 'refreshTokenExpiry:', refreshTokenExpiry);
+  //console.log('API Request - tokenExpiry:', tokenExpiry, 'refreshToken:', refreshToken, 'refreshTokenExpiry:', refreshTokenExpiry);
   // Check if token is expired
   if (tokenExpiry && new Date(tokenExpiry) <= new Date()) {
     // Check if refresh token is still valid

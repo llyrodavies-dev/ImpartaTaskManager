@@ -1,4 +1,4 @@
-export const jobStatusLabels: Record<number, string> = {
+export const JobStatusLabels: Record<number, string> = {
     0: 'Unspecified',
     1: 'Not Started',
     2: 'In Progress',

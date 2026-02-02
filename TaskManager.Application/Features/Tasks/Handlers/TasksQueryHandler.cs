@@ -32,7 +32,7 @@ namespace TaskManager.Application.Features.Tasks.Handlers
             User domainUser = await _userAuthorizationService.GetAuthenticatedUserAsync(cancellationToken);
 
             // Add the userId filter to restrict results to the authenticated user
-            var filters = AddDefaultFilter(request.Filter, domainUser.Id);
+            var filters = AddDefaultFilter(request.Filters, domainUser.Id);
 
             QueryFilterHelper.ValidateFilters(_filterModelConfig, filters);
 

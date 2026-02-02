@@ -1,0 +1,16 @@
+export const FilterOperatorLabels: Record<number, string> = {
+    0: 'None',
+    1: 'Equals',
+    2: 'NotEquals',
+    3: 'LessThan',
+    4: 'LessThanOrEqual',
+    5: 'GreaterThan',
+    6: 'GreaterThanOrEqual',
+    7: 'In',
+    8: 'NotIn',
+    9: 'Before',
+    10: 'After',
+    11: 'Between',
+    50: 'IsNull',
+    99: 'Contains',
+};

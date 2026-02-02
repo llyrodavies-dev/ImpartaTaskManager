@@ -1,4 +1,4 @@
-export const taskItemStatusLabels: Record<number, string> = {
+export const TaskItemStatusLabels: Record<number, string> = {
     0: 'Unspecified',
     1: 'Not Started',
     2: 'In Progress',

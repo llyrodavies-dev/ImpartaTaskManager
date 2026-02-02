@@ -22,7 +22,7 @@ namespace TaskManager.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> GetJobs()
         {
             return Ok(await _mediator.Send(new JobsQuery()));
         }

@@ -102,7 +102,7 @@ namespace Utility.Filtering
 
                     case FilterOperator.Contains:
                         query = $"{fieldName}.Contains(@{paramIndex})";
-                        AddValueAndIncrementCount(values[1], type, ref paramIndex, ref args);
+                        AddValueAndIncrementCount(values[0], type, ref paramIndex, ref args);
                         break;
 
                     default:
