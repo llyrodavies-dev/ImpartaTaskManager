@@ -7,7 +7,7 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <div>
+      <div style={{backgroundColor: 'var(--color-grey-blue-2)' , minHeight: 'calc(100vh - var(--navbar-height))'}}>
         <AppRoutes />
       </div>
     </BrowserRouter>

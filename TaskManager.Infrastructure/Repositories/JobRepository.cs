@@ -21,6 +21,14 @@ namespace TaskManager.Infrastructure.Repositories
                 .Where(x=>x.UserId == UserId).ToListAsync(cancellationToken);
         }
 
+        public async Task<List<Job>> GetAllJobsWithTasksAsync(Guid UserId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Jobs
+                .AsNoTracking()
+                .Include(j => j.Tasks)
+                .Where(x=>x.UserId == UserId).ToListAsync(cancellationToken);
+        }
+
         public async Task<(List<Job>, int)> GetJobsByUserIdPagedAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Jobs

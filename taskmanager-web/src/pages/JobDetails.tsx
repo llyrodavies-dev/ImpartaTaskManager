@@ -15,7 +15,10 @@ export default function JobDetails() {
     const [jobResponse, setJobResponse] = useState<JobDto | null>(null);
 
     useEffect(() => {
-        const fetchJobs = async () => {
+        fetchJobs();
+    }, []);
+
+    const fetchJobs = async () => {
             const auth = getAuth();
             const token = auth.token;
             if (!token) return;
@@ -27,12 +30,26 @@ export default function JobDetails() {
             if (handleApiResponse(result)) return;
             setJobResponse(result);
         };
-        fetchJobs();
-    }, []);
+
+    const handleDelete = async (jobId: number) => {
+        if (!window.confirm('Are you sure you want to delete this job?')) return;
+        const auth = getAuth();
+        const token = auth.token;
+        try {
+            await api.delete(`jobs/${jobId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            fetchJobs();
+        } catch (err) {
+            // Optionally handle error
+        }
+    };
 
     return(
         <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Job Details</h1>
+            <h1 className="text-2xl font-bold mb-4 text-blue-800">Job Details</h1>
             {errorTitle && (
                 <div className="mb-4 text-red-600 text-center font-semibold">{errorTitle}</div>
             )}
@@ -47,45 +64,78 @@ export default function JobDetails() {
             )}
 
             {jobResponse && (
-                <div className="mb-8 bg-white rounded-lg shadow-md p-6">
-                    <div className="mb-2"><span className="font-semibold">Title:</span> {jobResponse.title}</div>
-                    <div className="mb-2"><span className="font-semibold">Status:</span> {JobStatusLabels[jobResponse.status] ?? jobResponse.status}</div>
-                    <div className="mb-2"><span className="font-semibold">Created At:</span> {new Date(jobResponse.createdAtUtc).toLocaleString()}</div>
-                    <div className="mb-2"><span className="font-semibold">Created By:</span> {jobResponse.createdBy}</div>
-                    {jobResponse.modifiedAtUtc && (
-                        <div className="mb-2"><span className="font-semibold">Modified At:</span> {new Date(jobResponse.modifiedAtUtc).toLocaleString()}</div>
-                    )}
-                    {jobResponse.modifiedBy && (
-                        <div className="mb-2"><span className="font-semibold">Modified By:</span> {jobResponse.modifiedBy}</div>
-                    )}
+                <div className="mb-8 bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-4">
+                    <div>
+                        <div className="font-semibold text-blue-800">Title</div>
+                        <div className="text-gray-900">{jobResponse.title}</div>
+                    </div>
+                    <div>
+                        <div className="font-semibold text-blue-800">Status</div>
+                        <div className="text-gray-900">{JobStatusLabels[jobResponse.status] ?? jobResponse.status}</div>
+                    </div>
+                    <div>
+                        <div className="font-semibold text-blue-800">Created At</div>
+                        <div className="text-gray-900">{new Date(jobResponse.createdAtUtc).toLocaleString()}</div>
+                    </div>
+                    </div>
                 </div>
-            )}
+                )}
 
-            <h2 className="text-xl font-bold mb-4">Tasks</h2>
+            <h2 className="text-xl font-bold mb-4 text-blue-800">Job Tasks</h2>
             {jobResponse?.tasks && jobResponse.tasks.length > 0 ? (
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white rounded shadow">
+                    <table
+                        className="min-w-full rounded-xl border-separate"
+                        style={{
+                            background: 'var(--color-white-1)',
+                            borderCollapse: 'separate',
+                            borderSpacing: 0,
+                        }}
+                    >
                         <thead>
-                            <tr>
-                                <th className="px-4 py-2 text-left">Title</th>
-                                <th className="px-4 py-2 text-left">Description</th>
-                                <th className="px-4 py-2 text-left">Status</th>
-                                <th className="px-4 py-2 text-left">Created At</th>
-                                <th className="px-4 py-2 text-left">Created By</th>
-                                <th className="px-4 py-2 text-left">Modified At</th>
-                                <th className="px-4 py-2 text-left">Modified By</th>
+                            <tr style={{ background: '#e3eaf2' }}>
+                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopLeftRadius: '0.75rem' }}>Title</th>
+                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Description</th>
+                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Status</th>
+                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Created At</th>
+                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopRightRadius: '0.75rem'  }}>Options</th>
                             </tr>
                         </thead>
                         <tbody>
                             {jobResponse.tasks.map(task => (
-                                <tr key={task.id} className="border-t">
-                                    <td className="px-4 py-2">{task.title}</td>
-                                    <td className="px-4 py-2">{task.description}</td>
-                                    <td className="px-4 py-2">{TaskItemStatusLabels[task.status] ?? task.status}</td>
-                                    <td className="px-4 py-2">{new Date(task.createdAtUtc).toLocaleString()}</td>
-                                    <td className="px-4 py-2">{task.createdBy}</td>
-                                    <td className="px-4 py-2">{task.modifiedAtUtc ? new Date(task.modifiedAtUtc).toLocaleString() : '-'}</td>
-                                    <td className="px-4 py-2">{task.modifiedBy ?? '-'}</td>
+                                <tr key={task.id} className="hover:bg-gray-50">
+                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{task.title}</td>
+                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{task.description}</td>
+                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{TaskItemStatusLabels[task.status] ?? task.status}</td>
+                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{new Date(task.createdAtUtc).toLocaleString()}</td>
+                                    <td className="py-2 px-4 border-b flex gap-2" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                    <select
+                                        className="border rounded px-2 py-1 text-sm"
+                                        value={task.status}
+                                        onChange={async (e) => {
+                                            const newStatus = e.target.value;
+                                            const auth = getAuth();
+                                            const token = auth.token;
+                                            // Call your API to update the status
+                                            await api.put(`tasks/${task.id}/status`, { status: newStatus }, {
+                                                headers: { Authorization: `Bearer ${token}` }
+                                            });
+                                            fetchJobs()
+                                        }}
+                                    >
+                                        {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
+                                            <option key={status} value={status}>{label}</option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
+                                        // onClick={() => handleDelete(job.id)}
+                                        title="Delete"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
                                 </tr>
                             ))}
                         </tbody>

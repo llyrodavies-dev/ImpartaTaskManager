@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.Application.Features.Dashboard.Query;
 using Utility.Mediator;
 
 namespace TaskManager.Api.Controllers
@@ -19,8 +20,7 @@ namespace TaskManager.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDashboardData()
         {
-            // Implementation for getting dashboard data
-            return Ok();
+            return Ok(await _mediator.Send(new GetDashboardDataQuery()));
         }
     }
 }

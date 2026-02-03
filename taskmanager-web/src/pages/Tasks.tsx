@@ -16,13 +16,16 @@ type TasksQuery = {
 
 const FIELD_OPTIONS = [
     { value: 'Title', label: 'Title' },
+    { value: 'Description', label: 'Description' },
     { value: 'Status', label: 'Status' },
-    { value: 'CreatedBy', label: 'Created By' },
-    // Add more fields as needed for this page
 ];
 
 const FIELD_OPERATORS = {
     Title: [
+        { value: 1, label: 'Equals' },
+        { value: 99, label: 'Contains' },
+    ],
+    Description: [
         { value: 1, label: 'Equals' },
         { value: 99, label: 'Contains' },
     ],
@@ -71,8 +74,7 @@ export default function Tasks(){
 
     return(
         <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Tasks</h1>
-
+            <h1 className="text-2xl font-bold mb-4 text-blue-800">My Tasks</h1>
             <TaskFilterForm
                 fieldOptions={FIELD_OPTIONS}
                 fieldOperators={FIELD_OPERATORS}
@@ -80,6 +82,7 @@ export default function Tasks(){
                 onAddFilter={handleAddFilter}
                 onDeleteFilter={handleDeleteFilter}
             />
+
             {errorTitle && (
                 <div className="mb-4 text-red-600 text-center font-semibold">{errorTitle}</div>
             )}
@@ -92,38 +95,52 @@ export default function Tasks(){
                     )}
                 </ul>
             )}
-                {tasksResponse?.items && tasksResponse.items.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full bg-white rounded shadow">
-                            <thead>
-                                <tr>
-                                    <th className="px-4 py-2 text-left">Title</th>
-                                    <th className="px-4 py-2 text-left">Description</th>
-                                    <th className="px-4 py-2 text-left">Status</th>
-                                    <th className="px-4 py-2 text-left">Created At</th>
-                                    <th className="px-4 py-2 text-left">Created By</th>
-                                    <th className="px-4 py-2 text-left">Modified At</th>
-                                    <th className="px-4 py-2 text-left">Modified By</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {tasksResponse.items.map(task => (
-                                    <tr key={task.id} className="border-t">
-                                        <td className="px-4 py-2">{task.title}</td>
-                                        <td className="px-4 py-2">{task.description}</td>
-                                        <td className="px-4 py-2">{TaskItemStatusLabels[task.status] ?? task.status}</td>
-                                        <td className="px-4 py-2">{new Date(task.createdAtUtc).toLocaleString()}</td>
-                                        <td className="px-4 py-2">{task.createdBy}</td>
-                                        <td className="px-4 py-2">{task.modifiedAtUtc ? new Date(task.modifiedAtUtc).toLocaleString() : '-'}</td>
-                                        <td className="px-4 py-2">{task.modifiedBy ?? '-'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <div className="text-gray-500 text-center mt-8">No tasks found for this job.</div>
+            <div className="overflow-x-auto">
+                <table
+                    className="min-w-full rounded-xl border-separate"
+                    style={{
+                        background: 'var(--color-white-1)',
+                        borderCollapse: 'separate',
+                        borderSpacing: 0,
+                    }}
+                >
+                    <thead>
+                        <tr style={{ background: '#e3eaf2' }}>
+                            <th
+                                className="py-3 px-4 font-semibold border-b text-blue-800"
+                                style={{
+                                    borderColor: 'var(--color-grey-blue-1)',
+                                    borderTopLeftRadius: '0.75rem',
+                                }}
+                            >
+                                Title
+                            </th>
+                            <th className="py-3 px-4 font-semibold border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                Description
+                            </th>
+                            <th className="py-3 px-4 font-semibold border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                Status
+                            </th>
+                            <th className="py-3 px-4 font-semibold border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                Created At
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tasksResponse && tasksResponse.items.map(task => (
+                            <tr key={task.id} className="hover:bg-gray-50">
+                                <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{task.title}</td>
+                                <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{task.description}</td>
+                                <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{TaskItemStatusLabels[task.status] ?? task.status}</td>
+                                <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{new Date(task.createdAtUtc).toLocaleString()}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {tasksResponse && tasksResponse.totalCount === 0 && (
+                    <div className="text-gray-500 text-center mt-8">No tasks found.</div>
                 )}
+            </div>
         </div>
     );
 }

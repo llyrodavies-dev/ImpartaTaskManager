@@ -108,7 +108,6 @@ namespace TaskManager.Application.Features.Tasks.Handlers
                         : (int)y.Status == (int)TaskItemStatus.InProgress ? TaskItemStatus.InProgress.ToString()
                         : (int)y.Status == (int)TaskItemStatus.Completed ? TaskItemStatus.Completed.ToString()
                         : (int)y.Status == (int)TaskItemStatus.Blocked ? TaskItemStatus.Blocked.ToString()
-                        : (int)y.Status == (int)TaskItemStatus.Cancelled ? TaskItemStatus.Cancelled.ToString()
                         : TaskItemStatus.Unspecified.ToString();
         }
 #pragma warning restore S3358 // Ternary operators should not be nested

@@ -3,6 +3,5 @@ export const TaskItemStatusLabels: Record<number, string> = {
     1: 'Not Started',
     2: 'In Progress',
     3: 'Completed',
-    4: 'Blocked',
-    5: 'Cancelled',
+    4: 'Blocked'
 };

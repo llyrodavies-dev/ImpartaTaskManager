@@ -8,5 +8,6 @@ export interface JobDto {
   createdBy: string;
   modifiedAtUtc?: string;
   modifiedBy?: string;
+  tasksCount : number;
   tasks?: TaskItemDto[]; 
 }

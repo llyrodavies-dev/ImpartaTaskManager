@@ -13,19 +13,31 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav style={{ 
+      backgroundColor: 'var(--color-navbar)', 
+      height: 'var(--navbar-height)', 
+      display: 'flex', 
+      alignItems: 'center', 
+      padding: '0 1rem' ,
+      justifyContent: 'space-between'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
       <Link to="/" className="text-white mr-4 hover:text-blue-300">Home</Link>
-      <Link to="/about" className="text-white mr-4 hover:text-blue-300">About</Link>
-      {isLoggedIn ? (
+      {isLoggedIn && (
         <>
           <Link to="/dashboard" className="text-white mr-4 hover:text-blue-300">Dashboard</Link>
-          <Link to="/jobs" className="text-white mr-4 hover:text-blue-300">Jobs</Link>
-          <Link to="/tasks" className="text-white mr-4 hover:text-blue-300">Tasks</Link>
-          <button onClick={handleSignOut} className="text-white hover:text-red-400">Sign Out</button>
+          <Link to="/jobs" className="text-white mr-4 hover:text-blue-300">My Jobs</Link>
+          <Link to="/tasks" className="text-white mr-4 hover:text-blue-300">My Tasks</Link>
         </>
-      ) : (
-        <Link to="/signIn" className="text-white hover:text-blue-300">Sign In</Link>
       )}
+      </div>
+      <div>
+        {isLoggedIn ? (
+          <button onClick={handleSignOut} className="text-white hover:text-red-400">Sign Out</button>
+         ) : (
+            <Link to="/signIn" className="text-white hover:text-blue-300">Sign In</Link>
+        )}
+      </div>
     </nav>
   );
 }

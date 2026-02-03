@@ -38,5 +38,13 @@ namespace TaskManager.Api.Controllers
             // Implementation for updating task status
             return Ok();
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteTask(Guid id)
+        {
+            // Implementation for updating a task
+            return Ok();
+        }
     }
 }
