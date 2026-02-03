@@ -8,6 +8,7 @@ import { TaskItemStatusLabels } from '../models/enums/TaskItemStatusLabels';
 import EditTaskModal from '../components/modals/EditTaskModal';
 import type { JobDto } from '../models/JobDto';
 import type { UpdateTaskCommand } from '../models/UpdateTaskCommand';
+import type { CreateTaskCommand } from '../models/CreateTaskCommand';
 
 
 export default function JobDetails() {
@@ -52,6 +53,21 @@ export default function JobDetails() {
         }
     };
 
+    const handleCreateTask = async (data: CreateTaskCommand) => {
+        setEditLoading(true);
+        const auth = getAuth();
+        const token = auth.token;
+        try {
+            await api.post<CreateTaskCommand>(`jobs/${id}/tasks`, data, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setEditTask(null);
+            fetchJobs();
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
     const handleDelete = async (jobId: string) => {
         if (!window.confirm('Are you sure you want to delete this job?')) return;
         const auth = getAuth();
@@ -66,7 +82,7 @@ export default function JobDetails() {
 
     return(
         <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4 text-blue-800">Job Details</h1>
+            <h1 className="text-2xl font-bold mb-4 text-blue-800 text-left" style={{paddingLeft: '20px'}}>Job Details</h1>
             {errorTitle && (
                 <div className="mb-4 text-red-600 text-center font-semibold">{errorTitle}</div>
             )}
@@ -81,25 +97,31 @@ export default function JobDetails() {
             )}
 
             {jobResponse && (
-                <div className="mb-8 bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-4">
-                    <div>
-                        <div className="font-semibold text-blue-800">Title</div>
+                <div className="mb-8 bg-white rounded-xl shadow-lg p-8 max-w-2xl">
+                    <div className="mb-4 flex items-center gap-2">
+                        <div className="font-semibold text-blue-800">Title:</div>
                         <div className="text-gray-900">{jobResponse.title}</div>
                     </div>
-                    <div>
-                        <div className="font-semibold text-blue-800">Status</div>
+                    <div className="mb-4 flex items-center gap-2">
+                        <div className="font-semibold text-blue-800">Status:</div>
                         <div className="text-gray-900">{JobStatusLabels[jobResponse.status] ?? jobResponse.status}</div>
                     </div>
-                    <div>
-                        <div className="font-semibold text-blue-800">Created At</div>
+                    <div className="mb-4 flex items-center gap-2">
+                        <div className="font-semibold text-blue-800">Created At:</div>
                         <div className="text-gray-900">{new Date(jobResponse.createdAtUtc).toLocaleString()}</div>
-                    </div>
                     </div>
                 </div>
                 )}
-
-            <h2 className="text-xl font-bold mb-4 text-blue-800">Job Tasks</h2>
+            <div className="flex items-center justify-between mb-4"
+                style={{ paddingLeft:'20px', paddingRight:'20px' }}>
+                <h1 className="text-2xl font-bold text-blue-800">Job Tasks</h1>
+                <button
+                    className="bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-2 rounded shadow transition"
+                    onClick={() => setEditTask({ id: '', title: '', description: '' })}
+                >
+                    + Add New Task
+                </button>
+            </div>
             {jobResponse?.tasks && jobResponse.tasks.length > 0 ? (
                 <div className="overflow-x-auto">
                     <table
@@ -139,21 +161,17 @@ export default function JobDetails() {
                                                     headers: { Authorization: `Bearer ${token}` }
                                                 });
                                                 fetchJobs()
-                                            }}
-                                        >
+                                            }}>
                                             {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
                                                 <option key={status} value={status}>{label}</option>
                                             ))}
                                         </select>
-                                        <button
-                                                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+                                        <button className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 text-sm"
                                                 onClick={() => setEditTask({ id: task.id, title: task.title, description: task.description })}
-                                                title="Edit"
-                                            >
+                                                title="Edit">
                                                 Edit
                                             </button>
-                                        <button
-                                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
+                                        <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
                                             onClick={() => handleDelete(task.id)}
                                             title="Delete">
                                             Delete
@@ -170,7 +188,7 @@ export default function JobDetails() {
             <EditTaskModal
                 editTask={editTask}
                 setEditTask={setEditTask}
-                onSave={handleEditTask}
+                onSave={editTask && !editTask.id ? handleCreateTask : handleEditTask}
                 editLoading={editLoading}
             />
         </div>

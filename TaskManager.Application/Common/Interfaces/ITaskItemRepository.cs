@@ -6,6 +6,7 @@ namespace TaskManager.Application.Common.Interfaces
 {
     public interface ITaskItemRepository
     {
+        Task AddTaskAsync(TaskItem taskItem, CancellationToken cancellationToken);
         Task<TaskItem?> GetTaskItemByIdAsync(Guid taskItemId, CancellationToken cancellationToken);
         void DeleteTask(TaskItem taskItem);
         Task<PagedResponse<TaskItemProjection>> GetTaskItemsFilteredAsync(string queryString, Dictionary<string, object> args, Func<IQueryable<TaskItemProjection>, IQueryable<TaskItemProjection>>? sort, CancellationToken cancellationToken, int skip = 0, int? take = null);

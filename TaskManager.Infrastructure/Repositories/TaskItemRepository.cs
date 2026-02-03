@@ -23,6 +23,11 @@ namespace TaskManager.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.Id == taskItemId, cancellationToken);
         }
 
+        public async Task AddTaskAsync(TaskItem taskItem, CancellationToken cancellationToken)
+        {
+            await _dbContext.Tasks.AddAsync(taskItem, cancellationToken);
+        }
+
         public void DeleteTask(TaskItem taskItem)
         {
             _dbContext.Tasks.Remove(taskItem);

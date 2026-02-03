@@ -106,7 +106,7 @@ export default function Tasks(){
 
     return(
         <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4 text-blue-800">My Tasks</h1>
+            <h1 className="text-2xl font-bold mb-4 text-blue-800 text-left" style={{paddingLeft: '20px'}}>My Tasks</h1>
             <TaskFilterForm
                 fieldOptions={FIELD_OPTIONS}
                 fieldOperators={FIELD_OPERATORS}

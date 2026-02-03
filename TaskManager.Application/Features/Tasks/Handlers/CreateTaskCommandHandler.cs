@@ -1,4 +1,5 @@
-﻿using TaskManager.Application.Common.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Application.Common.Interfaces;
 using TaskManager.Application.Exceptions;
 using TaskManager.Application.Features.Tasks.Commands;
 using TaskManager.Application.Features.Tasks.DTOs;
@@ -13,13 +14,15 @@ namespace TaskManager.Application.Features.Tasks.Handlers
         private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;
         private readonly IJobRepository _jobRepository;
+        private readonly ITaskItemRepository _taskRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CreateTaskCommandHandler(ICurrentUserService currentUserService, IUserRepository userRepository, IJobRepository jobRepository, IUnitOfWork unitOfWork)
+        public CreateTaskCommandHandler(ICurrentUserService currentUserService, IUserRepository userRepository, IJobRepository jobRepository, ITaskItemRepository taskRepository, IUnitOfWork unitOfWork)
         {
             _currentUserService = currentUserService;
             _userRepository = userRepository;
             _jobRepository = jobRepository;
+            _taskRepository = taskRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -37,12 +40,10 @@ namespace TaskManager.Application.Features.Tasks.Handlers
             if (job.UserId != domainUser.Id)
                 throw new UnauthorizedAccessException("You don't have permission to add tasks to this job");
 
-            job.AddTask(request.Title, request.Description, _currentUserService.Email ?? "system");
+            var newTask = new TaskItem(job.Id, request.Title, request.Description, _currentUserService.Email ?? "system");
+            await _taskRepository.AddTaskAsync(newTask, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            // Get the newly created task
-            var newTask = job.Tasks.Last();
 
             return TaskItemDto.FromDomain(newTask);
         }

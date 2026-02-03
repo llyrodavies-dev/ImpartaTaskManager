@@ -29,7 +29,7 @@ namespace TaskManager.Application.Features.Jobs.Handlers
             User? domainUser = await _userRepository.GetUserByIdentityUserId(_currentUserService.UserId.Value)
                 ?? throw new NotFoundException("IdentityUser", _currentUserService.UserId.Value);
 
-            Job? job = await _jobRepository.GetJobByIdAndTasksAsync(request.JobId, cancellationToken)
+            Job? job = await _jobRepository.GetJobByIdAndTasksAsNoTrackingAsync(request.JobId, cancellationToken)
                 ?? throw new NotFoundException(nameof(Job), request.JobId);
 
             if (job.UserId != domainUser.Id)

@@ -3,19 +3,23 @@ import { api } from '../services/ApiService';
 import { useApiError } from '../hooks/useApiError';
 import { useAuthStorage } from '../hooks/useAuthStorage';
 import { useNavigate } from 'react-router-dom';
-import type { JobsPagedResponse } from '../models/JobsPagedResponse';
-import type { JobDto } from '../models/JobDto';
 import { JobStatusLabels } from '../models/enums/JobStatusLabels';
+import type { JobsPagedResponse } from '../models/JobsPagedResponse';
+import CreateEditJobModal from '../components/modals/CreateEditJobModal';
+import type { CreateJobCommand } from '../models/CreateJobCommand';
+import type { UpdateJobRequest } from '../models/UpdateJobRequest';
+import type { UpdateTaskCommand } from '../models/UpdateTaskCommand';
 
 export default function Jobs() {
     const { errorTitle, validationErrors, handleApiResponse } = useApiError();
     const { getAuth } = useAuthStorage();
     const [jobsResponse, setJobsResponse] = useState<JobsPagedResponse | null>(null);
+    const [editJob, setEditJob] = useState<{ id: string; title: string; description: string } | null>(null);
+    const [editLoading, setEditLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchJobs();
-        // eslint-disable-next-line
     }, []);
 
     const fetchJobs = async () => {
@@ -30,6 +34,36 @@ export default function Jobs() {
         if (handleApiResponse(result)) return;
         setJobsResponse(result);
     };
+
+    const handleEditJob = async (data: UpdateTaskCommand) => {
+            setEditLoading(true);
+            const auth = getAuth();
+            const token = auth.token;
+            try {
+                await api.put<UpdateJobRequest>(`tasks/${data.id}`, data, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setEditJob(null);
+                fetchJobs();
+            } finally {
+                setEditLoading(false);
+            }
+        };
+    
+        const handleCreateJob = async (data: CreateJobCommand) => {
+            setEditLoading(true);
+            const auth = getAuth();
+            const token = auth.token;
+            try {
+                await api.post<CreateJobCommand>(`jobs`, data, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setEditJob(null);
+                fetchJobs();
+            } finally {
+                setEditLoading(false);
+            }
+        };
 
     const handleDelete = async (jobId: number) => {
         if (!window.confirm('Are you sure you want to delete this job?')) return;
@@ -48,9 +82,17 @@ export default function Jobs() {
     };
 
     return (
-        <div
-            className="p-8">
-            <h1 className="text-2xl font-bold mb-4 text-blue-800">Jobs</h1>
+        <div className="p-8">
+            <div className="flex items-center justify-between mb-4"
+                style={{ paddingLeft:'20px', paddingRight:'20px' }}>
+                <h1 className="text-2xl font-bold text-blue-800">Jobs</h1>
+                <button
+                    className="bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-2 rounded shadow transition"
+                    onClick={() => setEditJob({ id: '', title: '', description: '' })}
+                >
+                    + Add New Job
+                </button>
+            </div>
             {errorTitle && (
                 <div className="mb-4 text-red-600 text-center font-semibold">{errorTitle}</div>
             )}
@@ -112,9 +154,9 @@ export default function Jobs() {
                                 <td className="py-2 px-4 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
                                     {job.tasksCount ?? 0}
                                 </td>
-                                <td className="py-2 px-4 border-b flex gap-2" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                <td className="py-2 px-4 border-b flex gap-2 justify-center" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
                                     <button
-                                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+                                        className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 text-sm"
                                         onClick={() => navigate(`/jobs/${job.id}`)}
                                         title="View"
                                     >
@@ -128,7 +170,7 @@ export default function Jobs() {
                                         Edit
                                     </button> */}
                                     <button
-                                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
+                                        className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
                                         // onClick={() => handleDelete(job.id)}
                                         title="Delete"
                                     >
@@ -143,6 +185,12 @@ export default function Jobs() {
                     <div className="text-gray-500 text-center mt-8">No jobs found.</div>
                 )}
             </div>
+                        <CreateEditJobModal
+                            editJob={editJob}
+                            setEditJob={setEditJob}
+                            onSave={editJob && !editJob.id ? handleCreateJob : handleEditJob}
+                            editLoading={editLoading}
+                        />
         </div>
     );
 }

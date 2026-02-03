@@ -19,7 +19,9 @@ export default function Navbar() {
       display: 'flex', 
       alignItems: 'center', 
       padding: '0 1rem' ,
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+      paddingLeft:'60px',
+      paddingRight:'60px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
       <Link to="/" className="text-white mr-4 hover:text-blue-300">Home</Link>

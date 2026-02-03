@@ -22,12 +22,6 @@ namespace TaskManager.Domain.Entities
             SetCreated(createdBy);
         }
 
-        public void AddTask(string title, string description, string createdBy)
-        {
-            var task = new TaskItem(Id, title, description, createdBy);
-            _tasks.Add(task);
-        }
-
         public void UpdateTitle(string title, string modifiedBy)
         {
             Title = title;

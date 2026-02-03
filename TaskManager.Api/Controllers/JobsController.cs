@@ -51,10 +51,9 @@ namespace TaskManager.Api.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateJob(Guid id)
+        public async Task<IActionResult> UpdateJob(Guid id, UpdateJobRequest request)
         {
-            // Implementation for updating a job
-            return Ok();
+            return Ok(await _mediator.Send(new UpdateJobCommand(id, request.Title)));
         }
     }
 }

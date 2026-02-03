@@ -9,6 +9,7 @@ namespace TaskManager.Domain.Interfaces
         Task<(List<Job>, int)> GetJobsByUserIdPagedAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<Job?> GetJobByIdAsync(Guid jobId, CancellationToken cancellationToken = default);
         Task<Job?> GetJobByIdAndTasksAsync(Guid jobId, CancellationToken cancellationToken = default);
+        Task<Job?> GetJobByIdAndTasksAsNoTrackingAsync(Guid jobId, CancellationToken cancellationToken = default);
         Task AddAsync(Job newJob, CancellationToken cancellationToken);
     }
 }
