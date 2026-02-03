@@ -1,7 +1,9 @@
-export interface TaskItemDto {
-    id: string;
-    sortColumn: string;
-    isDescending: boolean;
-    pageNumber: number;
-    pageSize: number;
-}
+import type { FilterRequest } from './FilterRequest';
+
+export interface TasksQuery {
+    page?: number;
+    pageSize?: number;
+    sortColumn?: string;
+    isDescending?: boolean;
+    filters?: FilterRequest[];
+};

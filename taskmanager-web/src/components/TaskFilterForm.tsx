@@ -110,20 +110,26 @@ export default function TaskFilterForm({ fieldOptions, fieldOperators, filters, 
             {filters.length > 0 && (
                 <div className="mt-4">
                     <ul>
-                        {filters.map((f, idx) => (
-                            <li key={idx} className="flex items-center gap-2 mb-2">
-                                <span className="px-3 py-1 bg-gray-100 rounded text-gray-700 text-sm shadow-sm">
-                                    {getFieldLabel(f.FieldName)} {getOperatorLabel(f.Operator)} "<span className="font-semibold">{f.Values[0]}</span>"
-                                </span>
-                                <button
-                                    onClick={() => onDeleteFilter(idx)}
-                                    className="ml-2 text-red-600 hover:underline text-sm"
-                                    title="Delete"
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
+                        {filters.map((f, idx) => {
+                            let valueDisplay = f.Values[0];
+                            if (f.FieldName === "Status") {
+                                valueDisplay = TaskItemStatusLabels[Number(f.Values[0])] || f.Values[0];
+                            }
+                            return (
+                                <li key={idx} className="flex items-center gap-2 mb-2">
+                                    <span className="px-3 py-1 bg-blue-50 rounded-lg text-blue-800 text-sm font-medium shadow">
+                                        {getFieldLabel(f.FieldName)} {getOperatorLabel(f.Operator)} "<span className="font-semibold">{valueDisplay}</span>"
+                                    </span>
+                                    <button
+                                        onClick={() => onDeleteFilter(idx)}
+                                        className="ml-2 text-red-600 hover:underline text-sm"
+                                        title="Delete"
+                                    >
+                                        Delete
+                                    </button>
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
             )}

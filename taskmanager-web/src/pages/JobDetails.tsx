@@ -209,6 +209,7 @@ export default function JobDetails() {
                                                 <select
                                                     className="border rounded px-2 py-1 text-sm"
                                                     value={task.status}
+                                                    disabled={task.status === 3} // Disable if status is Completed
                                                     onClick={e => e.stopPropagation()}
                                                     onChange={async (e) => {
                                                         const newStatus = e.target.value;
@@ -220,16 +221,25 @@ export default function JobDetails() {
                                                         });
                                                         fetchJobs()
                                                     }}>
-                                                    {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
-                                                        <option key={status} value={status}>{label}</option>
-                                                    ))}
+                                                    {Object.entries(TaskItemStatusLabels)
+                                                        .filter(([status]) => status !== "0") // Exclude "Unspecified"
+                                                        .map(([status, label]) => (
+                                                            <option key={status} value={status}>{label}</option>
+                                                        ))}
                                                 </select>
-                                                <button className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 text-sm"
+                                                <button
+                                                    className={`px-3 py-1 rounded text-sm
+                                                        ${task.status === 3
+                                                            ? "bg-gray-400 text-gray-200"
+                                                            : "bg-blue-700 text-white hover:bg-blue-800"}
+                                                    `}
+                                                    disabled={task.status === 3}
                                                     onClick={e => {
                                                         e.stopPropagation();
                                                         setEditTask({ id: task.id, title: task.title, description: task.description });
                                                     }}
-                                                    title="Edit">
+                                                    title="Edit"
+                                                >
                                                     Edit
                                                 </button>
                                                 <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"

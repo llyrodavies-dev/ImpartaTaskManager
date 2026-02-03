@@ -42,5 +42,11 @@ namespace TaskManager.Api.Controllers
 
             return File(profileImageDto.FileStream, profileImageDto.ContentType, profileImageDto.FileName);
         }
+
+        [HttpGet("info")]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            return Ok(await _mediator.Send(new GetUserInfoQuery()));
+        }
     }
 }

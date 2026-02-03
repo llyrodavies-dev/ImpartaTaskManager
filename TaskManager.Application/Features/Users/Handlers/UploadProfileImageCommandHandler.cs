@@ -13,20 +13,17 @@ namespace TaskManager.Application.Features.Users.Handlers
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly IUserAuthorizationService _userAuthorizationService;
-        private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly FileStorageOptions _fileStorageOptions;
 
         public UploadProfileImageCommandHandler(
             IFileStorageService fileStorageService,
             IUserAuthorizationService userAuthorizationService,
-            IUserRepository userRepository,
             IUnitOfWork unitOfWork,
             IOptions<FileStorageOptions> fileStorageOptions)
         {
             _fileStorageService = fileStorageService;
             _userAuthorizationService = userAuthorizationService;
-            _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _fileStorageOptions = fileStorageOptions.Value;
         }

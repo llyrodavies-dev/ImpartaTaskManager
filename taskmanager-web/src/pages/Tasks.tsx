@@ -8,14 +8,7 @@ import type { FilterRequest } from '../models/FilterRequest';
 import type { UpdateTaskCommand } from '../models/UpdateTaskCommand';
 import TaskFilterForm from '../components/TaskFilterForm';
 import EditTaskModal from '../components/modals/EditTaskModal';
-
-type TasksQuery = {
-    page?: number;
-    pageSize?: number;
-    sortColumn?: string;
-    isDescending?: boolean;
-    filters?: FilterRequest[];
-};
+import type { TasksQuery } from '../models/TasksQuery';
 
 const FIELD_OPTIONS = [
     { value: 'Title', label: 'Title' },
@@ -330,6 +323,7 @@ export default function Tasks(){
                                             <select
                                                 className="border rounded px-2 py-1 text-sm"
                                                 value={task.status}
+                                                disabled={task.status === 3} // Disable if status is Completed
                                                 onChange={async (e) => {
                                                     const newStatus = e.target.value;
                                                     const auth = getAuth();
@@ -342,12 +336,19 @@ export default function Tasks(){
                                                 }}
                                                 onClick={e => e.stopPropagation()}
                                             >
-                                                {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
-                                                    <option key={status} value={status}>{label}</option>
-                                                ))}
+                                                {Object.entries(TaskItemStatusLabels)
+                                                    .filter(([status]) => status !== "0") // Exclude "Unspecified"
+                                                    .map(([status, label]) => (
+                                                        <option key={status} value={status}>{label}</option>
+                                                    ))}
                                             </select>
                                             <button
-                                                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+                                                className={`px-3 py-1 rounded text-sm
+                                                    ${task.status === 3
+                                                        ? "bg-gray-400 text-gray-200"
+                                                        : "bg-blue-600 text-white hover:bg-blue-700"}
+                                                `}
+                                                disabled={task.status === 3}
                                                 onClick={e => {
                                                     e.stopPropagation();
                                                     setEditTask({ id: task.id, title: task.title, description: task.description });

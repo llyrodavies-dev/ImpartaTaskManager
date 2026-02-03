@@ -20,6 +20,7 @@ namespace TaskManager.Application
 
             // application services
             services.AddScoped<IUserAuthorizationService, UserAuthorizationService>();
+            services.AddScoped<IJobStatusService, JobStatusService>();
 
             // Register validators, behaviors
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using TaskManager.Application.Common.Interfaces;
 using TaskManager.Application.Exceptions;
 using TaskManager.Application.Features.Tasks.Commands;
@@ -11,28 +12,24 @@ namespace TaskManager.Application.Features.Tasks.Handlers
 {
     public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskItemDto>
     {
-        private readonly ICurrentUserService _currentUserService;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserAuthorizationService _userAuthorizationService;
         private readonly IJobRepository _jobRepository;
         private readonly ITaskItemRepository _taskRepository;
+        private readonly IJobStatusService _jobStatusService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CreateTaskCommandHandler(ICurrentUserService currentUserService, IUserRepository userRepository, IJobRepository jobRepository, ITaskItemRepository taskRepository, IUnitOfWork unitOfWork)
+        public CreateTaskCommandHandler(IJobRepository jobRepository, ITaskItemRepository taskRepository, IUnitOfWork unitOfWork, IJobStatusService jobStatusService, IUserAuthorizationService userAuthorizationService)
         {
-            _currentUserService = currentUserService;
-            _userRepository = userRepository;
             _jobRepository = jobRepository;
             _taskRepository = taskRepository;
             _unitOfWork = unitOfWork;
+            _jobStatusService = jobStatusService;
+            _userAuthorizationService = userAuthorizationService;
         }
 
         public async Task<TaskItemDto> Handle(CreateTaskCommand request, CancellationToken cancellationToken = default)
         {
-            if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == null)
-                throw new UnauthorizedAccessException("User is not authenticated");
-
-            var domainUser = await _userRepository.GetUserByIdentityUserId(_currentUserService.UserId.Value)
-                ?? throw new NotFoundException("User", _currentUserService.UserId.Value);
+            User domainUser = await _userAuthorizationService.GetAuthenticatedUserAsync(cancellationToken);
 
             Job job = await _jobRepository.GetJobByIdAndTasksAsync(request.JobId, cancellationToken)
                 ?? throw new NotFoundException("Job", request.JobId);
@@ -40,10 +37,13 @@ namespace TaskManager.Application.Features.Tasks.Handlers
             if (job.UserId != domainUser.Id)
                 throw new UnauthorizedAccessException("You don't have permission to add tasks to this job");
 
-            var newTask = new TaskItem(job.Id, request.Title, request.Description, _currentUserService.Email ?? "system");
+            var newTask = new TaskItem(job.Id, request.Title, request.Description, domainUser.Email ?? "system");
             await _taskRepository.AddTaskAsync(newTask, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            // Update parent job status based on all its tasks
+            await _jobStatusService.UpdateJobStatusAsync(job.Id, domainUser.Email ?? "system", cancellationToken);
 
             return TaskItemDto.FromDomain(newTask);
         }
