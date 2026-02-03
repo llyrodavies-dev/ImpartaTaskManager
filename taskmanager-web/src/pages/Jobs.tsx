@@ -5,7 +5,7 @@ import { useAuthStorage } from '../hooks/useAuthStorage';
 import { useNavigate } from 'react-router-dom';
 import type { JobsPagedResponse } from '../models/JobsPagedResponse';
 import type { JobDto } from '../models/JobDto';
-import { jobStatusLabels } from '../models/enums/JobStatusLabels';
+import { JobStatusLabels } from '../models/enums/JobStatusLabels';
 
 
 export default function Jobs() {
@@ -54,7 +54,7 @@ export default function Jobs() {
                         >
                         <div>
                             <h2 className="text-xl font-semibold mb-2">{job.title}</h2>
-                            <p className="mb-1"><span className="font-medium">Status:</span> {jobStatusLabels[job.status] ?? job.status}</p>
+                            <p className="mb-1"><span className="font-medium">Status:</span> {JobStatusLabels[job.status] ?? job.status}</p>
                         </div>
                         <button
                             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold transition"

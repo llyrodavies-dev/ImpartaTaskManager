@@ -49,6 +49,9 @@ namespace TaskManager.Api.Middleware
                 NotFoundException notFound =>
                     (HttpStatusCode.NotFound, CreateProblemDetails(HttpStatusCode.NotFound, "Resource Not Found", notFound.Message, context)),
 
+                BadRequestException badRequest =>
+                    (HttpStatusCode.BadRequest, CreateProblemDetails(HttpStatusCode.BadRequest, "Bad Request", badRequest.Message, context)),
+
                 _ => (HttpStatusCode.InternalServerError, CreateProblemDetails(HttpStatusCode.InternalServerError, "An unexpected error occurred", "An error occurred processing your request.", context))
             };
 

@@ -5,6 +5,7 @@ export interface ApiOptions {
   headers?: Record<string, string>;
   body?: any;
   params?: Record<string, string | number>;
+  responseType?: 'json' | 'blob';
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7114/api/';
@@ -43,17 +44,34 @@ async function apiRequest<T = any>( path: string, method: HttpMethod = 'GET', op
     }
   }
 
-  const { headers, body, params } = options;
+  const { headers, body, params, responseType } = options;
   const url = buildUrl(path, params);
+  // Set Content-Type only for JSON requests
+  // Needed to make additional changes here for blob/form-data support
+  const isBlob = responseType === 'blob';
+  const isFormData = body instanceof FormData;
+
+  const fetchHeaders = {
+    ...(isBlob ? {} : { 'Content-Type': 'application/json' }),
+    ...(auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
+    ...headers,
+  };
+
+  // Remove Content-Type for FormData so browser sets it with boundary
+  if (isFormData && fetchHeaders['Content-Type']) {
+    delete fetchHeaders['Content-Type'];
+  }
+
   const response = await fetch(url, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
-      ...headers,
-    },
-    body: body ? JSON.stringify(body) : undefined,
+    headers: fetchHeaders,
+    body: isFormData ? body : (body && !isBlob ? JSON.stringify(body) : undefined),
   });
+
+  if (isBlob) {
+    const blob = await response.blob();
+    return blob as T;
+  }
 
   const contentType = response.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');

@@ -5,12 +5,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TaskManager.Application.Common.Configuration;
 using TaskManager.Application.Common.Interfaces;
 using TaskManager.Domain.Interfaces;
 using TaskManager.Infrastructure.Identity;
 using TaskManager.Infrastructure.Interfaces;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Repositories;
+using TaskManager.Infrastructure.Services;
 using AuthService = TaskManager.Infrastructure.Identity.AuthService;
 
 namespace TaskManager.Infrastructure
@@ -59,6 +61,12 @@ namespace TaskManager.Infrastructure
 
             // Infrastructure layer interfaces
             services.AddScoped<ITokenService, TokenService>();
+
+            // Configure FileStorage options (defined in Application layer)
+            services.Configure<FileStorageOptions>(configuration.GetSection(FileStorageOptions.SectionName));
+
+            // Register FileStorageService with base path from configuration
+            services.AddSingleton<IFileStorageService, FileStorageService>();
 
             return services;
         }

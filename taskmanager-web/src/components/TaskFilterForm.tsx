@@ -5,12 +5,6 @@ import { TaskItemStatusLabels } from '../models/enums/TaskItemStatusLabels';
 type FieldOption = { value: string; label: string };
 type OperatorOption = { value: number; label: string };
 
-const OPERATOR_OPTIONS: OperatorOption[] = [
-    { value: 1, label: 'Equals' },
-    { value: 99, label: 'Contains' },
-    // Add more as needed
-];
-
 interface TaskFilterFormProps {
     fieldOptions: FieldOption[];
     fieldOperators: { [fieldName: string]: OperatorOption[] };

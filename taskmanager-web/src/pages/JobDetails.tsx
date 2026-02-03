@@ -4,8 +4,8 @@ import { useApiError } from '../hooks/useApiError';
 import { useAuthStorage } from '../hooks/useAuthStorage';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { JobDto } from '../models/JobDto';
-import { jobStatusLabels } from '../models/enums/JobStatusLabels';
-import { taskItemStatusLabels } from '../models/enums/TaskItemStatusLabels';
+import { JobStatusLabels } from '../models/enums/JobStatusLabels';
+import { TaskItemStatusLabels } from '../models/enums/TaskItemStatusLabels';
 
 
 export default function JobDetails() {
@@ -49,7 +49,7 @@ export default function JobDetails() {
             {jobResponse && (
                 <div className="mb-8 bg-white rounded-lg shadow-md p-6">
                     <div className="mb-2"><span className="font-semibold">Title:</span> {jobResponse.title}</div>
-                    <div className="mb-2"><span className="font-semibold">Status:</span> {jobStatusLabels[jobResponse.status] ?? jobResponse.status}</div>
+                    <div className="mb-2"><span className="font-semibold">Status:</span> {JobStatusLabels[jobResponse.status] ?? jobResponse.status}</div>
                     <div className="mb-2"><span className="font-semibold">Created At:</span> {new Date(jobResponse.createdAtUtc).toLocaleString()}</div>
                     <div className="mb-2"><span className="font-semibold">Created By:</span> {jobResponse.createdBy}</div>
                     {jobResponse.modifiedAtUtc && (
@@ -81,7 +81,7 @@ export default function JobDetails() {
                                 <tr key={task.id} className="border-t">
                                     <td className="px-4 py-2">{task.title}</td>
                                     <td className="px-4 py-2">{task.description}</td>
-                                    <td className="px-4 py-2">{taskItemStatusLabels[task.status] ?? task.status}</td>
+                                    <td className="px-4 py-2">{TaskItemStatusLabels[task.status] ?? task.status}</td>
                                     <td className="px-4 py-2">{new Date(task.createdAtUtc).toLocaleString()}</td>
                                     <td className="px-4 py-2">{task.createdBy}</td>
                                     <td className="px-4 py-2">{task.modifiedAtUtc ? new Date(task.modifiedAtUtc).toLocaleString() : '-'}</td>

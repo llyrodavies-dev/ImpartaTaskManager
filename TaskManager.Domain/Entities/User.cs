@@ -33,5 +33,11 @@ namespace TaskManager.Domain.Entities
 
             SetCreated(createdBy);
         }
+
+        public void UpdateProfileImage(string profileImagePath, string modifiedBy)
+        {
+            ProfileImagePath = profileImagePath;
+            SetModified(modifiedBy);
+        }
     }
 }

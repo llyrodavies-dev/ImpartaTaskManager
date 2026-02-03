@@ -24,6 +24,12 @@
     <ProjectReference Include="..\Utility.Mediator\Utility.Mediator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Assets\Images\Default_Profile_Image.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
