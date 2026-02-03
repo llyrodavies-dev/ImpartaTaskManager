@@ -40,6 +40,13 @@ namespace TaskManager.Infrastructure.Repositories
             return (await query.ToListAsync(cancellationToken), totalCount);
         }
 
+        public async Task<Job?> GetJobByIdAsync(Guid jobId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Jobs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(j => j.Id == jobId, cancellationToken);
+        }
+
         public async Task<Job?> GetJobByIdAndTasksAsync(Guid jobId, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Jobs

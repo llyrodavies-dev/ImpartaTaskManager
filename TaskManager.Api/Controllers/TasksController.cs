@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.Api.Contracts;
+using TaskManager.Application.Features.Tasks.Commands;
 using TaskManager.Application.Features.Tasks.Query;
 using Utility.Mediator;
 
@@ -25,26 +27,23 @@ namespace TaskManager.Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateTask(Guid id)
+        public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UpdateTaskCommand command)
         {
-            // Implementation for updating a task
-            return Ok();
+            return Ok(await _mediator.Send(command));
         }
 
         [HttpPatch]
         [Route("{id}/status")]
-        public async Task<IActionResult> UpdateTaskStatus(Guid id, TaskStatus taskStatus)
+        public async Task<IActionResult> UpdateTaskStatus(Guid id, [FromBody] UpdateTaskStatusRequest request)
         {
-            // Implementation for updating task status
-            return Ok();
+            return Ok(await _mediator.Send(new UpdateTaskStatusCommand(id, request.Status)));
         }
 
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteTask(Guid id)
         {
-            // Implementation for updating a task
-            return Ok();
+            return Ok(await _mediator.Send(new DeleteTaskCommand(id)));
         }
     }
 }

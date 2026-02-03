@@ -3,16 +3,21 @@ import { api } from '../services/ApiService';
 import { useApiError } from '../hooks/useApiError';
 import { useAuthStorage } from '../hooks/useAuthStorage';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { JobDto } from '../models/JobDto';
 import { JobStatusLabels } from '../models/enums/JobStatusLabels';
 import { TaskItemStatusLabels } from '../models/enums/TaskItemStatusLabels';
+import EditTaskModal from '../components/modals/EditTaskModal';
+import type { JobDto } from '../models/JobDto';
+import type { UpdateTaskCommand } from '../models/UpdateTaskCommand';
 
 
 export default function JobDetails() {
+    const [jobResponse, setJobResponse] = useState<JobDto | null>(null);
+    const [editTask, setEditTask] = useState<{ id: string; title: string; description: string } | null>(null);
+    const [editLoading, setEditLoading] = useState(false);
+
     const { errorTitle, validationErrors, handleApiResponse } = useApiError();
     const { getAuth } = useAuthStorage();
     const { id } = useParams<{ id: string }>();
-    const [jobResponse, setJobResponse] = useState<JobDto | null>(null);
 
     useEffect(() => {
         fetchJobs();
@@ -31,20 +36,32 @@ export default function JobDetails() {
             setJobResponse(result);
         };
 
-    const handleDelete = async (jobId: number) => {
-        if (!window.confirm('Are you sure you want to delete this job?')) return;
+
+    const handleEditTask = async (data: UpdateTaskCommand) => {
+        setEditLoading(true);
         const auth = getAuth();
         const token = auth.token;
         try {
-            await api.delete(`jobs/${jobId}`, {
+            await api.put<UpdateTaskCommand>(`tasks/${data.id}`, data, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setEditTask(null);
+            fetchJobs();
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    const handleDelete = async (jobId: string) => {
+        if (!window.confirm('Are you sure you want to delete this job?')) return;
+        const auth = getAuth();
+        const token = auth.token;
+            await api.delete(`tasks/${jobId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             fetchJobs();
-        } catch (err) {
-            // Optionally handle error
-        }
     };
 
     return(
@@ -109,33 +126,39 @@ export default function JobDetails() {
                                     <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{task.description}</td>
                                     <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{TaskItemStatusLabels[task.status] ?? task.status}</td>
                                     <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{new Date(task.createdAtUtc).toLocaleString()}</td>
-                                    <td className="py-2 px-4 border-b flex gap-2" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                    <select
-                                        className="border rounded px-2 py-1 text-sm"
-                                        value={task.status}
-                                        onChange={async (e) => {
-                                            const newStatus = e.target.value;
-                                            const auth = getAuth();
-                                            const token = auth.token;
-                                            // Call your API to update the status
-                                            await api.put(`tasks/${task.id}/status`, { status: newStatus }, {
-                                                headers: { Authorization: `Bearer ${token}` }
-                                            });
-                                            fetchJobs()
-                                        }}
-                                    >
-                                        {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
-                                            <option key={status} value={status}>{label}</option>
-                                        ))}
-                                    </select>
-                                    <button
-                                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
-                                        // onClick={() => handleDelete(job.id)}
-                                        title="Delete"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+                                    <td className="py-2 px-4 border-b flex gap-2 justify-center" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                        <select
+                                            className="border rounded px-2 py-1 text-sm"
+                                            value={task.status}
+                                            onChange={async (e) => {
+                                                const newStatus = e.target.value;
+                                                const auth = getAuth();
+                                                const token = auth.token;
+
+                                                await api.patch(`tasks/${task.id}/status`, { status: newStatus }, {
+                                                    headers: { Authorization: `Bearer ${token}` }
+                                                });
+                                                fetchJobs()
+                                            }}
+                                        >
+                                            {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
+                                                <option key={status} value={status}>{label}</option>
+                                            ))}
+                                        </select>
+                                        <button
+                                                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+                                                onClick={() => setEditTask({ id: task.id, title: task.title, description: task.description })}
+                                                title="Edit"
+                                            >
+                                                Edit
+                                            </button>
+                                        <button
+                                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
+                                            onClick={() => handleDelete(task.id)}
+                                            title="Delete">
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -144,6 +167,12 @@ export default function JobDetails() {
             ) : (
                 <div className="text-gray-500 text-center mt-8">No tasks found for this job.</div>
             )}
+            <EditTaskModal
+                editTask={editTask}
+                setEditTask={setEditTask}
+                onSave={handleEditTask}
+                editLoading={editLoading}
+            />
         </div>
     );
 }

@@ -23,19 +23,25 @@ async function apiRequest<T = any>( path: string, method: HttpMethod = 'GET', op
     // Check if refresh token is still valid
     if (refreshToken && refreshTokenExpiry && new Date(refreshTokenExpiry) > new Date()) {
       // Attempt to refresh token
-      const refreshResponse = await fetch(`${API_BASE_URL}auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
-      });
-      if (refreshResponse.ok) {
-        const newAuth = await refreshResponse.json();
-        setAuth(newAuth);
-        auth = newAuth;
-      } else {
-        // Refresh failed, clear auth and throw error
-        clearAuth();
-        throw new Error('Session expired. Please log in again.');
+      try
+      {
+        const refreshResponse = await fetch(`${API_BASE_URL}auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+        if (refreshResponse.ok) {
+          const newAuth = await refreshResponse.json();
+          setAuth(newAuth);
+          auth = newAuth;
+        } else {
+          // Refresh failed, clear auth and throw error
+          clearAuth();
+          throw new Error('Session expired. Please log in again.');
+        }
+      } catch (error) {
+          clearAuth();
+          throw new Error('Session expired. Please log in again.');
       }
     } else {
       // No valid refresh token, clear auth and throw error
@@ -62,21 +68,27 @@ async function apiRequest<T = any>( path: string, method: HttpMethod = 'GET', op
     delete fetchHeaders['Content-Type'];
   }
 
-  const response = await fetch(url, {
-    method,
-    headers: fetchHeaders,
-    body: isFormData ? body : (body && !isBlob ? JSON.stringify(body) : undefined),
-  });
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: fetchHeaders,
+      body: isFormData ? body : (body && !isBlob ? JSON.stringify(body) : undefined),
+    });
+  
 
-  if (isBlob) {
-    const blob = await response.blob();
-    return blob as T;
+    if (isBlob) {
+      const blob = await response.blob();
+      return blob as T;
+    }
+    const contentType = response.headers.get('content-type');
+    const isJson = contentType && contentType.includes('application/json');
+    const data = isJson ? await response.json() : null;
+    return data as T;
   }
-
-  const contentType = response.headers.get('content-type');
-  const isJson = contentType && contentType.includes('application/json');
-  const data = isJson ? await response.json() : null;
-  return data as T;
+  catch (error) {
+    console.error('Network error:', error);
+    throw new Error('Network error. Please check your connection and try again.');
+  }
 }
 
 function buildUrl(path: string, params?: Record<string, string | number>) {

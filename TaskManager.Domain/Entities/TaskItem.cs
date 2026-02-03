@@ -25,5 +25,12 @@ namespace TaskManager.Domain.Entities
             Status = status;
             SetModified(modifiedBy);
         }
+
+        public void UpdateDetails(string title, string description, string modifiedBy)
+        {
+            Title = title;
+            Description = description;
+            SetModified(modifiedBy);
+        }
     }
 }

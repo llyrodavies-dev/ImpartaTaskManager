@@ -29,9 +29,9 @@ export default function SignIn() {
     };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+    <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - var(--navbar-height))'}}>
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold text-center mb-2">Job Manager</h1>
+        <h1 className="text-3xl font-bold text-center mb-2 text-blue-800" >Job Manager</h1>
         <h2 className="text-lg text-gray-700 text-center mb-6">Sign in to your account</h2>
         {errorTitle && (
           <div className="mb-4 text-red-600 text-center font-semibold">{errorTitle}</div>

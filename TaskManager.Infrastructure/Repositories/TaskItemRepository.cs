@@ -2,6 +2,7 @@
 using System.Linq.Dynamic.Core;
 using TaskManager.Application.Common.Interfaces;
 using TaskManager.Application.Common.Models;
+using TaskManager.Domain.Entities;
 using TaskManager.Domain.Projections;
 using TaskManager.Infrastructure.Persistence;
 
@@ -14,6 +15,17 @@ namespace TaskManager.Infrastructure.Repositories
         public TaskItemRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public async Task<TaskItem?> GetTaskItemByIdAsync(Guid taskItemId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Tasks
+                .FirstOrDefaultAsync(t => t.Id == taskItemId, cancellationToken);
+        }
+
+        public void DeleteTask(TaskItem taskItem)
+        {
+            _dbContext.Tasks.Remove(taskItem);
         }
 
         public async Task<PagedResponse<TaskItemProjection>> GetTaskItemsFilteredAsync(string queryString, Dictionary<string, object> args, Func<IQueryable<TaskItemProjection>, IQueryable<TaskItemProjection>>? sort, CancellationToken cancellationToken, int skip = 0, int? take = null)
