@@ -85,9 +85,11 @@ export default function TaskFilterForm({ fieldOptions, fieldOperators, filters, 
                             className="border border-gray-300 rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
                         >
                             <option value="">Select status</option>
-                            {Object.entries(TaskItemStatusLabels).map(([value, label]) => (
-                                <option key={value} value={value}>{label}</option>
-                            ))}
+                            {Object.entries(TaskItemStatusLabels)
+                                .filter(([value]) => value !== "0") // Exclude "Unspecified"
+                                .map(([value, label]) => (
+                                    <option key={value} value={value}>{label}</option>
+                                ))}
                         </select>
                     ) : (
                         <input

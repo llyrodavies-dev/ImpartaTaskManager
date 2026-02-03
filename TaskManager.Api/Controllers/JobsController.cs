@@ -34,6 +34,13 @@ namespace TaskManager.Api.Controllers
             return Ok(await _mediator.Send(new JobDetailsQuery(id)));
         }
 
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> DeleteJobById(Guid id)
+        {
+            return Ok(await _mediator.Send(new DeleteJobCommand(id)));
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateJob([FromBody] CreateJobCommand command)
         {

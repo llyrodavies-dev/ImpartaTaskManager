@@ -19,6 +19,7 @@ namespace TaskManager.Infrastructure.Extensions
 
             var dbContext = services.GetRequiredService<ApplicationDbContext>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
             var configuration = services.GetRequiredService<IConfiguration>();
 
             // Check if we should reset the database
@@ -31,10 +32,25 @@ namespace TaskManager.Infrastructure.Extensions
 
             await dbContext.Database.MigrateAsync();
 
+
             // Seed data
+            await SeedRoles(roleManager);
             await SeedData(dbContext, userManager);
 
             return app;
+        }
+
+        private static async Task SeedRoles(RoleManager<IdentityRole<Guid>> roleManager)
+        {
+            string[] roles = { "Admin", "User" };
+
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                }
+            }
         }
 
         private static async Task SeedData(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
@@ -53,10 +69,13 @@ namespace TaskManager.Infrastructure.Extensions
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(identityUser, "Password12345!");
+                var result = await userManager.CreateAsync(identityUser, "Test123!");
 
                 if (result.Succeeded)
                 {
+                    // Add user to role
+                    await userManager.AddToRoleAsync(identityUser, "User");
+
                     // Create Domain user
                     User domainUser = new(identityUser.Id, email, "Ali", "system");
                     await dbContext.DomainUsers.AddAsync(domainUser);

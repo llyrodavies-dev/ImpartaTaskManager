@@ -13,9 +13,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:711
 async function apiRequest<T = any>( path: string, method: HttpMethod = 'GET', options: ApiOptions = {} ): Promise<T> {
 
   let auth = getAuth();
-  const tokenExpiry = auth.tokenExpiry;
-  const refreshToken = auth.refreshToken;
-  const refreshTokenExpiry = auth.refreshTokenExpiry;
+  const tokenExpiry = auth?.tokenExpiry;
+  const refreshToken = auth?.refreshToken;
+  const refreshTokenExpiry = auth?.refreshTokenExpiry;
 
   //console.log('API Request - tokenExpiry:', tokenExpiry, 'refreshToken:', refreshToken, 'refreshTokenExpiry:', refreshTokenExpiry);
   // Check if token is expired
@@ -59,7 +59,7 @@ async function apiRequest<T = any>( path: string, method: HttpMethod = 'GET', op
 
   const fetchHeaders = {
     ...(isBlob ? {} : { 'Content-Type': 'application/json' }),
-    ...(auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
+    ...(auth && auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
     ...headers,
   };
 

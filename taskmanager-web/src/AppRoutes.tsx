@@ -7,6 +7,7 @@ import Jobs from './pages/Jobs';
 import ProtectedRoute from './components/ProtectedRoute';
 import JobDetails from './pages/JobDetails';
 import Tasks from './pages/Tasks';
+import SignUp from './pages/SignUp';
 
 export default function AppRoutes() {
   return (
@@ -14,6 +15,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/signIn" element={<SignIn />} />
+      <Route path="/signUp" element={<SignUp />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/jobs" element={<Jobs />} />

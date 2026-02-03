@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { JobStatusLabels } from '../models/enums/JobStatusLabels';
 import { TaskItemStatusLabels } from '../models/enums/TaskItemStatusLabels';
 import EditTaskModal from '../components/modals/EditTaskModal';
+import DeleteModal from '../components/modals/DeleteModal';
 import type { JobDto } from '../models/JobDto';
 import type { UpdateTaskCommand } from '../models/UpdateTaskCommand';
 import type { CreateTaskCommand } from '../models/CreateTaskCommand';
@@ -15,6 +16,9 @@ export default function JobDetails() {
     const [jobResponse, setJobResponse] = useState<JobDto | null>(null);
     const [editTask, setEditTask] = useState<{ id: string; title: string; description: string } | null>(null);
     const [editLoading, setEditLoading] = useState(false);
+    const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+    const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const { errorTitle, validationErrors, handleApiResponse } = useApiError();
     const { getAuth } = useAuthStorage();
@@ -68,16 +72,21 @@ export default function JobDetails() {
         }
     };
 
-    const handleDelete = async (jobId: string) => {
-        if (!window.confirm('Are you sure you want to delete this job?')) return;
+    const handleDelete = async (taskId: string) => {
+        setDeleteLoading(true);
         const auth = getAuth();
         const token = auth.token;
-            await api.delete(`tasks/${jobId}`, {
+        try {
+            await api.delete(`tasks/${taskId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             fetchJobs();
+        } finally {
+            setDeleteLoading(false);
+            setDeleteTaskId(null);
+        }
     };
 
     return(
@@ -108,7 +117,7 @@ export default function JobDetails() {
                     </div>
                     <div className="mb-4 flex items-center gap-2">
                         <div className="font-semibold text-blue-800">Created At:</div>
-                        <div className="text-gray-900">{new Date(jobResponse.createdAtUtc).toLocaleString()}</div>
+                        <div className="text-gray-900">{new Date(jobResponse.createdAtUtc).toLocaleString('en-GB')}</div>
                     </div>
                 </div>
                 )}
@@ -134,51 +143,108 @@ export default function JobDetails() {
                     >
                         <thead>
                             <tr style={{ background: '#e3eaf2' }}>
-                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopLeftRadius: '0.75rem' }}>Title</th>
+                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopLeftRadius: '0.75rem' }}>Status</th>
+                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Title</th>
                                 <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Description</th>
-                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Status</th>
                                 <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Created At</th>
                                 <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopRightRadius: '0.75rem'  }}>Options</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {jobResponse.tasks.map(task => (
-                                <tr key={task.id} className="hover:bg-gray-50">
-                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{task.title}</td>
-                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{task.description}</td>
-                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{TaskItemStatusLabels[task.status] ?? task.status}</td>
-                                    <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>{new Date(task.createdAtUtc).toLocaleString()}</td>
-                                    <td className="py-2 px-4 border-b flex gap-2 justify-center" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                        <select
-                                            className="border rounded px-2 py-1 text-sm"
-                                            value={task.status}
-                                            onChange={async (e) => {
-                                                const newStatus = e.target.value;
-                                                const auth = getAuth();
-                                                const token = auth.token;
+                            {jobResponse.tasks.map((task, idx) => {
+                                const isExpanded = expandedTaskId === task.id;
+                                const isLastRow = idx === jobResponse.tasks!.length - 1;
+                                return (
+                                    <tr
+                                        key={task.id}
+                                        className="hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
+                                    >
+                                        <td
+                                            className="px-4 py-2 border-b"
+                                            style={{
+                                                borderColor: 'var(--color-grey-blue-1)',
+                                                ...(isLastRow && { borderBottomLeftRadius: '0.75rem' }),
+                                            }}
+                                        >
+                                            {TaskItemStatusLabels[task.status] ?? task.status}
+                                        </td>
+                                        <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                            {task.title}
+                                        </td>
+                                        <td
+                                            className="px-4 py-2 border-b"
+                                            style={{
+                                                borderColor: 'var(--color-grey-blue-1)',
+                                                maxWidth: '500px',
+                                                width: '500px',
+                                                overflow: isExpanded ? 'visible' : 'hidden',
+                                                textOverflow: isExpanded ? 'unset' : 'ellipsis',
+                                                whiteSpace: isExpanded ? 'normal' : 'nowrap',
+                                                overflowWrap: isExpanded ? 'break-word' : 'normal',
+                                                wordBreak: isExpanded ? 'break-word' : 'normal',
+                                            }}
+                                            title={!isExpanded ? task.description : undefined}
+                                        >
+                                            {task.description}
+                                        </td>
+                                        <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                            {new Date(task.createdAtUtc).toLocaleString('en-GB', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: 'numeric',
+                                                minute: '2-digit',
+                                                hour12: false
+                                            }).replace(/\//g, '-')}
+                                        </td>
+                                        <td
+                                            className="py-2 px-4 border-b"
+                                            style={{
+                                                borderColor: 'var(--color-grey-blue-1)',
+                                                ...(isLastRow && { borderBottomRightRadius: '0.75rem' }),
+                                            }}
+                                        >
+                                            <div className="flex gap-2 justify-center">
+                                                <select
+                                                    className="border rounded px-2 py-1 text-sm"
+                                                    value={task.status}
+                                                    onClick={e => e.stopPropagation()}
+                                                    onChange={async (e) => {
+                                                        const newStatus = e.target.value;
+                                                        const auth = getAuth();
+                                                        const token = auth.token;
 
-                                                await api.patch(`tasks/${task.id}/status`, { status: newStatus }, {
-                                                    headers: { Authorization: `Bearer ${token}` }
-                                                });
-                                                fetchJobs()
-                                            }}>
-                                            {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
-                                                <option key={status} value={status}>{label}</option>
-                                            ))}
-                                        </select>
-                                        <button className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 text-sm"
-                                                onClick={() => setEditTask({ id: task.id, title: task.title, description: task.description })}
-                                                title="Edit">
-                                                Edit
-                                            </button>
-                                        <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
-                                            onClick={() => handleDelete(task.id)}
-                                            title="Delete">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                                                        await api.patch(`tasks/${task.id}/status`, { status: newStatus }, {
+                                                            headers: { Authorization: `Bearer ${token}` }
+                                                        });
+                                                        fetchJobs()
+                                                    }}>
+                                                    {Object.entries(TaskItemStatusLabels).map(([status, label]) => (
+                                                        <option key={status} value={status}>{label}</option>
+                                                    ))}
+                                                </select>
+                                                <button className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 text-sm"
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        setEditTask({ id: task.id, title: task.title, description: task.description });
+                                                    }}
+                                                    title="Edit">
+                                                    Edit
+                                                </button>
+                                                <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        setDeleteTaskId(task.id); // <-- Open the modal instead of deleting immediately
+                                                    }}
+                                                    title="Delete">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
@@ -190,6 +256,13 @@ export default function JobDetails() {
                 setEditTask={setEditTask}
                 onSave={editTask && !editTask.id ? handleCreateTask : handleEditTask}
                 editLoading={editLoading}
+            />
+            <DeleteModal
+                open={deleteTaskId !== null}
+                itemName={jobResponse?.tasks?.find(t => t.id === deleteTaskId)?.title}
+                onConfirm={() => deleteTaskId && handleDelete(deleteTaskId)}
+                onCancel={() => setDeleteTaskId(null)}
+                loading={deleteLoading}
             />
         </div>
     );

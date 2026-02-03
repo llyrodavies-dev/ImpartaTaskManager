@@ -11,5 +11,6 @@ namespace TaskManager.Domain.Interfaces
         Task<Job?> GetJobByIdAndTasksAsync(Guid jobId, CancellationToken cancellationToken = default);
         Task<Job?> GetJobByIdAndTasksAsNoTrackingAsync(Guid jobId, CancellationToken cancellationToken = default);
         Task AddAsync(Job newJob, CancellationToken cancellationToken);
+        void Delete(Job job);
     }
 }

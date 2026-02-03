@@ -66,5 +66,10 @@ namespace TaskManager.Infrastructure.Repositories
         {
             await _dbContext.Jobs.AddAsync(newJob, cancellationToken);
         }
+
+        public void Delete(Job job)
+        {
+            _dbContext.Jobs.Remove(job);
+        }
     }
 }

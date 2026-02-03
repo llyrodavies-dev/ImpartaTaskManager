@@ -3,7 +3,7 @@ import { api } from '../services/ApiService';
 import type { LoginCommand } from '../models/LoginCommand';
 import { useApiError } from '../hooks/useApiError';
 import { useAuthStorage } from '../hooks/useAuthStorage';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function SignIn() {
     const { errorTitle, validationErrors, handleApiResponse } = useApiError();
@@ -19,7 +19,7 @@ export default function SignIn() {
         const loginCommand: LoginCommand = { email, password };
         const result = await api.post('auth/login', loginCommand);
         if (handleApiResponse(result)) {
-        console.error('Login failed:', result);
+          console.error('Login failed:', result);
         return;
         }
 
@@ -72,6 +72,15 @@ export default function SignIn() {
             Sign In
           </button>
         </form>
+        <div className="mt-6 text-center">
+          <span className="text-gray-600">Don't have an account?</span>
+          <Link
+            to="/signup"
+            className="ml-2 text-blue-600 hover:underline font-semibold"
+          >
+            Sign Up
+          </Link>
+        </div>
       </div>
     </div>
   );

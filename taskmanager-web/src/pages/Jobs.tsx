@@ -9,6 +9,7 @@ import CreateEditJobModal from '../components/modals/CreateEditJobModal';
 import type { CreateJobCommand } from '../models/CreateJobCommand';
 import type { UpdateJobRequest } from '../models/UpdateJobRequest';
 import type { UpdateTaskCommand } from '../models/UpdateTaskCommand';
+import DeleteModal from '../components/modals/DeleteModal';
 
 export default function Jobs() {
     const { errorTitle, validationErrors, handleApiResponse } = useApiError();
@@ -16,6 +17,8 @@ export default function Jobs() {
     const [jobsResponse, setJobsResponse] = useState<JobsPagedResponse | null>(null);
     const [editJob, setEditJob] = useState<{ id: string; title: string; description: string } | null>(null);
     const [editLoading, setEditLoading] = useState(false);
+    const [deleteJobId, setDeleteJobId] = useState<string | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -65,8 +68,8 @@ export default function Jobs() {
             }
         };
 
-    const handleDelete = async (jobId: number) => {
-        if (!window.confirm('Are you sure you want to delete this job?')) return;
+    const handleDelete = async (jobId: string) => {
+        setDeleteLoading(true);
         const auth = getAuth();
         const token = auth.token;
         try {
@@ -78,6 +81,9 @@ export default function Jobs() {
             fetchJobs(); // Refresh list after delete
         } catch (err) {
             // Optionally handle error
+        } finally {
+            setDeleteLoading(false);
+            setDeleteJobId(null);
         }
     };
 
@@ -143,42 +149,52 @@ export default function Jobs() {
                         </tr>
                     </thead>
                     <tbody>
-                        {jobsResponse?.items.map((job) => (
-                            <tr key={job.id} className="hover:bg-gray-50">
-                                <td className="py-2 px-4 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                    {JobStatusLabels[job.status] ?? job.status}
-                                </td>
-                                <td className="py-2 px-4 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                    {job.title}
-                                </td>
-                                <td className="py-2 px-4 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                    {job.tasksCount ?? 0}
-                                </td>
-                                <td className="py-2 px-4 border-b flex gap-2 justify-center" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                    <button
-                                        className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 text-sm"
-                                        onClick={() => navigate(`/jobs/${job.id}`)}
-                                        title="View"
+                        {jobsResponse?.items.map((job, idx) => {
+                            const isLastRow = idx === jobsResponse.items.length - 1;
+                            return (
+                                <tr key={job.id} className="hover:bg-gray-50">
+                                    <td
+                                        className="py-2 px-4 border-b"
+                                        style={{
+                                            borderColor: 'var(--color-grey-blue-1)',
+                                            ...(isLastRow && { borderBottomLeftRadius: '0.75rem' }),
+                                        }}
                                     >
-                                        View
-                                    </button>
-                                    {/* <button
-                                        className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-sm"
-                                        onClick={() => handleEdit(job.id)}
-                                        title="Edit"
+                                        {JobStatusLabels[job.status] ?? job.status}
+                                    </td>
+                                    <td className="py-2 px-4 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                        {job.title}
+                                    </td>
+                                    <td className="py-2 px-4 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                        {job.tasksCount ?? 0}
+                                    </td>
+                                    <td
+                                        className="py-2 px-4 border-b"
+                                        style={{
+                                            borderColor: 'var(--color-grey-blue-1)',
+                                            ...(isLastRow && { borderBottomRightRadius: '0.75rem' }),
+                                        }}
                                     >
-                                        Edit
-                                    </button> */}
-                                    <button
-                                        className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
-                                        // onClick={() => handleDelete(job.id)}
-                                        title="Delete"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                                        <div className="flex gap-2 justify-center">
+                                            <button
+                                                className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 text-sm"
+                                                onClick={() => navigate(`/jobs/${job.id}`)}
+                                                title="View"
+                                            >
+                                                View
+                                            </button>
+                                            <button
+                                                className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
+                                                onClick={() => setDeleteJobId(job.id)}
+                                                title="Delete"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
                 {jobsResponse && jobsResponse.totalCount === 0 && (
@@ -190,6 +206,13 @@ export default function Jobs() {
                             setEditJob={setEditJob}
                             onSave={editJob && !editJob.id ? handleCreateJob : handleEditJob}
                             editLoading={editLoading}
+                        />
+                        <DeleteModal
+                            open={deleteJobId !== null}
+                            itemName={jobsResponse?.items.find(j => j.id === deleteJobId)?.title}
+                            onConfirm={() => deleteJobId && handleDelete(deleteJobId)}
+                            onCancel={() => setDeleteJobId(null)}
+                            loading={deleteLoading}
                         />
         </div>
     );

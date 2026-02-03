@@ -5,7 +5,7 @@ export default function Navbar() {
   const { getAuth, clearAuth } = useAuthStorage();
   const navigate = useNavigate();
   const auth = getAuth();
-  const isLoggedIn = !!auth.token;
+  const isLoggedIn = !!auth && !!auth.token;
 
   const handleSignOut = () => {
     clearAuth();
@@ -29,7 +29,7 @@ export default function Navbar() {
         <>
           <Link to="/dashboard" className="text-white mr-4 hover:text-blue-300">Dashboard</Link>
           <Link to="/jobs" className="text-white mr-4 hover:text-blue-300">My Jobs</Link>
-          <Link to="/tasks" className="text-white mr-4 hover:text-blue-300">My Tasks</Link>
+          <Link to="/tasks" className="text-white mr-4 hover:text-blue-300">All Tasks</Link>
         </>
       )}
       </div>
