@@ -130,7 +130,7 @@ export default function Tasks(){
 
     return(
         <div className="p-8">
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+            <div className="bg-white rounded-xl shadow-lg p-4 mb-4">
                 <h1 className="text-2xl font-bold mb-4 text-blue-800 text-left main-text" style={{ paddingLeft: '20px' }}>
                     All Tasks
                 </h1>
@@ -173,10 +173,10 @@ export default function Tasks(){
                                     Status
                                     <span className="ml-2">
                                         <span className={query.sortColumn === 'Status' && !query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▲
+                                            ▼
                                         </span>
                                         <span className={query.sortColumn === 'Status' && query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▼
+                                            ▲
                                         </span>
                                     </span>
                                 </th>
@@ -188,10 +188,10 @@ export default function Tasks(){
                                     Title
                                     <span className="ml-2">
                                         <span className={query.sortColumn === 'Title' && !query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▲
+                                            ▼
                                         </span>
                                         <span className={query.sortColumn === 'Title' && query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▼
+                                            ▲
                                         </span>
                                     </span>
                                 </th>
@@ -203,10 +203,10 @@ export default function Tasks(){
                                     Description
                                     <span className="ml-2">
                                         <span className={query.sortColumn === 'Description' && !query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▲
+                                            ▼
                                         </span>
                                         <span className={query.sortColumn === 'Description' && query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▼
+                                            ▲
                                         </span>
                                     </span>
                                 </th>
@@ -218,10 +218,10 @@ export default function Tasks(){
                                     Created At
                                     <span className="ml-2">
                                         <span className={query.sortColumn === 'CreatedAtUtc' && !query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▲
+                                            ▼
                                         </span>
                                         <span className={query.sortColumn === 'CreatedAtUtc' && query.isDescending ? 'text-yellow-300 font-bold' : 'text-white'}>
-                                            ▼
+                                            ▲
                                         </span>
                                     </span>
                                 </th>

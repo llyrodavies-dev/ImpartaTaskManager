@@ -15,7 +15,7 @@ export default function Home() {
         <section className="mb-6">
           <h2 className="text-2xl font-semibold text-blue-800 mb-2">Overview</h2>
           <p className="text-gray-700">
-            <b className="main-text">Task Manager</b> is a modern web application designed to help individuals and teams efficiently manage jobs and tasks. With a clean interface and powerful features, you can easily track progress, collaborate, and stay organized.
+            <b className="main-text">Task Manager</b> is a modern web application designed to help individuals efficiently manage jobs and tasks. With a clean interface and powerful features, you can easily track progress, collaborate, and stay organized.
           </p>
         </section>
         {/* Key Features */}

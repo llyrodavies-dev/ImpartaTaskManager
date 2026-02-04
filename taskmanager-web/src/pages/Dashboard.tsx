@@ -12,7 +12,7 @@ export default function Dashboard() {
     const [dashboardData, setDashboardData] = useState<DashboardDataDto | null>(null);
     const [userInfo, setUserInfo] = useState<UserInfoDto | null>(null);
     const [tasksResponse, setTasksResponse] = useState<TasksPagedResponse | null>(null);
-    const [query] = useState<TasksQuery>({ page: 1, pageSize: 1, sortColumn: 'createdAt', isDescending: false, filters: [{ FieldName: 'Status', Operator: 1, Values: ['4'] }] });
+    const [query] = useState<TasksQuery>({ pageNumber: 1, pageSize: 1, sortColumn: 'createdAt', isDescending: false, filters: [{ FieldName: 'Status', Operator: 1, Values: ['4'] }] });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
