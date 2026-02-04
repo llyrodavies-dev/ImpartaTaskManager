@@ -14,11 +14,6 @@ namespace TaskManager.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
-        {
-            return await _dbContext.FindAsync<User>(email, cancellationToken);
-        }
-
         public async Task<User?> GetUserByIdentityUserId(Guid identityUserId, CancellationToken cancellationToken = default)
         {
             return await _dbContext.DomainUsers.FirstOrDefaultAsync(x => x.IdentityUserId == identityUserId, cancellationToken);

@@ -26,10 +26,10 @@ namespace TaskManager.Infrastructure.Identity
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            SymmetricSecurityKey key = new (Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            SigningCredentials credentials = new (key, SecurityAlgorithms.HmacSha256);
 
-            DateTime expiryTime = DateTime.UtcNow.AddMinutes(15); // TODO: set up to be configurable
+            DateTime expiryTime = DateTime.UtcNow.AddMinutes(15); // This would ideally be configurable
 
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
