@@ -97,7 +97,7 @@ export default function SignUp() {
                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
                     </div>
-                    <button type="submit" className="w-full py-2 rounded font-semibold transition button-signup">
+                    <button type="submit" className="w-full py-2 rounded font-semibold transition button-prim">
                         Sign Up
                     </button>
                 </form>

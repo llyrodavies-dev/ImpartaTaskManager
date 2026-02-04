@@ -83,7 +83,18 @@ export default function SignIn() {
             Sign Up
           </Link>
         </div>
+        <div className="mt-2 bg-blue-50 border border-blue-200 rounded text-center shadow-sm">
+        <div className="text-lg font-bold main-text mb-1">Demo Account</div>
+          <div className="text-gray-700">
+            <span className="main-text">Email:</span>
+            <span className="font-mono ml-2 main-text">Ali@example.com</span>
+            <br />
+            <span className="main-text">Password:</span>
+            <span className="font-mono ml-2 main-text">Test123!</span>
+          </div>
+        </div>
       </div>
+      
     </div>
   );
 }
