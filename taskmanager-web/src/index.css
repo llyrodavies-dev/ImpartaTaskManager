@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 :root {
-    --color-primary: #2563eb;
-    --color-primary-light: #3b82f6;
-    --color-primary-dark: #1e40af;
-    --color-background: #515772;   
+    /* Primary Colors */
+    --color-primary: #0e76d7;
+    --color-primary-light: #8cc4f8;
+    --color-primary-dark: #005ac6;
+
+    /* Other Colors */
+    --color-background-o: #515772;   
     --color-navbar: #323641;
     --navbar-height: 64px;
     --style-pink-1 : #483a4c;
@@ -20,4 +23,60 @@
     --color-grey-blue-2: #B7C9E2;
     --color-white-1 : #fff;
 
+    /* Text */
+    --text-heading: #102A43;
+    --text-body: #334E68;
+    --text-muted: #627D98;
+    --text-inverse: #FFF;
+    --text-link: #0E76D7;
+    --text-link-hover: #005AC6;
+
+    /* Navigation Bar */
+    --nav-background : #0A3F78;
+    --nav-text-color : #FFF;
+    --nav-hover : #0E76D7;
+
+    /* Main Backgrounds */
+    --main-background : #F7FAFD;
+    --main-alt-section : #FFF;
+
+    /* Buttons */
+    --btn-primary-bg: #0E76D7;
+    --btn-primary-hover: #005AC6;
+    --btn-primary-text: #FFF;
+    --btn-edit-bg: #E3EFFB;
+    --btn-edit-hover: #D2E6FA;
+    --btn-edit-text: #0E76D7;
+    --btn-edit-border: #8CC4F8;
+
+    /* Status Colors */
+    --status-success: #2DA44E;
+    --status-warning: #F0B429;
+    --status-error: #E5484D;
+    --status-info: #0E76D7;
+}
+
+.main-text {
+    color: var(--color-primary);
+}
+
+.main-text-light {
+    color: var(--color-primary-light);
+}
+
+.button-prim {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+}
+
+.button-prim:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.button-signup {
+    color: var(--text-body);
+}
+
+.row-bg {
+    background-color: var(--btn-edit-hover);
 }

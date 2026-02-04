@@ -34,13 +34,16 @@ namespace TaskManager.Application.Features.Tasks.Handlers
             // Add the userId filter to restrict results to the authenticated user
             var filters = AddDefaultFilter(request.Filters, domainUser.Id);
 
+            int skip = (request.PageNumber - 1) * request.PageSize;
+            int take = request.PageSize;
+
             QueryFilterHelper.ValidateFilters(_filterModelConfig, filters);
 
             string newSort = QueryFilterHelper.GenerateSortExpression(_filterModelConfig, request.SortColumn, request.IsDescending, nameof(TaskItemProjection.Id));
 
             (string filterQuery, Dictionary<string, object> filterArgs) = QueryFilterHelper.ParseFilters(filters);
 
-            PagedResponse<TaskItemProjection> pagedResponseProjection = await GetAllTaskItemsFilteredAsync(filterQuery, filterArgs, request.PageNumber, request.PageSize, newSort, cancellationToken);
+            PagedResponse<TaskItemProjection> pagedResponseProjection = await GetAllTaskItemsFilteredAsync(filterQuery, filterArgs, skip, take, newSort, cancellationToken);
 
             return new PagedResponse<TaskItemDto>
             {

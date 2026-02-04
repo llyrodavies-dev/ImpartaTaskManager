@@ -91,7 +91,7 @@ export default function JobDetails() {
 
     return(
         <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4 text-blue-800 text-left" style={{paddingLeft: '20px'}}>Job Details</h1>
+
             {errorTitle && (
                 <div className="mb-4 text-red-600 text-center font-semibold">{errorTitle}</div>
             )}
@@ -107,6 +107,7 @@ export default function JobDetails() {
 
             {jobResponse && (
                 <div className="mb-8 bg-white rounded-xl shadow-lg p-8 max-w-2xl">
+                    <h1 className="text-2xl font-bold mb-4 text-left main-text" style={{paddingLeft: '20px'}}>Job Details</h1>
                     <div className="mb-4 flex items-center gap-2">
                         <div className="font-semibold text-blue-800">Title:</div>
                         <div className="text-gray-900">{jobResponse.title}</div>
@@ -121,146 +122,147 @@ export default function JobDetails() {
                     </div>
                 </div>
                 )}
-            <div className="flex items-center justify-between mb-4"
-                style={{ paddingLeft:'20px', paddingRight:'20px' }}>
-                <h1 className="text-2xl font-bold text-blue-800">Job Tasks</h1>
-                <button
-                    className="bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-2 rounded shadow transition"
-                    onClick={() => setEditTask({ id: '', title: '', description: '' })}
-                >
-                    + Add New Task
-                </button>
-            </div>
-            {jobResponse?.tasks && jobResponse.tasks.length > 0 ? (
-                <div className="overflow-x-auto">
-                    <table
-                        className="min-w-full rounded-xl border-separate"
-                        style={{
-                            background: 'var(--color-white-1)',
-                            borderCollapse: 'separate',
-                            borderSpacing: 0,
-                        }}
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+                <div className="flex items-center justify-between mb-4" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
+                    <h1 className="text-2xl font-bold text-blue-800 main-text">Job Tasks</h1>
+                    <button
+                        className="bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-2 rounded shadow transition"
+                        onClick={() => setEditTask({ id: '', title: '', description: '' })}
                     >
-                        <thead>
-                            <tr style={{ background: '#e3eaf2' }}>
-                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopLeftRadius: '0.75rem' }}>Status</th>
-                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Title</th>
-                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Description</th>
-                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Created At</th>
-                                <th className="px-4 py-2 border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopRightRadius: '0.75rem'  }}>Options</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {jobResponse.tasks.map((task, idx) => {
-                                const isExpanded = expandedTaskId === task.id;
-                                const isLastRow = idx === jobResponse.tasks!.length - 1;
-                                return (
-                                    <tr
-                                        key={task.id}
-                                        className="hover:bg-gray-50 cursor-pointer"
-                                        onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
-                                    >
-                                        <td
-                                            className="px-4 py-2 border-b"
-                                            style={{
-                                                borderColor: 'var(--color-grey-blue-1)',
-                                                ...(isLastRow && { borderBottomLeftRadius: '0.75rem' }),
-                                            }}
-                                        >
-                                            {TaskItemStatusLabels[task.status] ?? task.status}
-                                        </td>
-                                        <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                            {task.title}
-                                        </td>
-                                        <td
-                                            className="px-4 py-2 border-b"
-                                            style={{
-                                                borderColor: 'var(--color-grey-blue-1)',
-                                                maxWidth: '500px',
-                                                width: '500px',
-                                                overflow: isExpanded ? 'visible' : 'hidden',
-                                                textOverflow: isExpanded ? 'unset' : 'ellipsis',
-                                                whiteSpace: isExpanded ? 'normal' : 'nowrap',
-                                                overflowWrap: isExpanded ? 'break-word' : 'normal',
-                                                wordBreak: isExpanded ? 'break-word' : 'normal',
-                                            }}
-                                            title={!isExpanded ? task.description : undefined}
-                                        >
-                                            {task.description}
-                                        </td>
-                                        <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
-                                            {new Date(task.createdAtUtc).toLocaleString('en-GB', {
-                                                day: '2-digit',
-                                                month: '2-digit',
-                                                year: 'numeric',
-                                                hour: 'numeric',
-                                                minute: '2-digit',
-                                                hour12: false
-                                            }).replace(/\//g, '-')}
-                                        </td>
-                                        <td
-                                            className="py-2 px-4 border-b"
-                                            style={{
-                                                borderColor: 'var(--color-grey-blue-1)',
-                                                ...(isLastRow && { borderBottomRightRadius: '0.75rem' }),
-                                            }}
-                                        >
-                                            <div className="flex gap-2 justify-center">
-                                                <select
-                                                    className="border rounded px-2 py-1 text-sm"
-                                                    value={task.status}
-                                                    disabled={task.status === 3} // Disable if status is Completed
-                                                    onClick={e => e.stopPropagation()}
-                                                    onChange={async (e) => {
-                                                        const newStatus = e.target.value;
-                                                        const auth = getAuth();
-                                                        const token = auth.token;
-
-                                                        await api.patch(`tasks/${task.id}/status`, { status: newStatus }, {
-                                                            headers: { Authorization: `Bearer ${token}` }
-                                                        });
-                                                        fetchJobs()
-                                                    }}>
-                                                    {Object.entries(TaskItemStatusLabels)
-                                                        .filter(([status]) => status !== "0") // Exclude "Unspecified"
-                                                        .map(([status, label]) => (
-                                                            <option key={status} value={status}>{label}</option>
-                                                        ))}
-                                                </select>
-                                                <button
-                                                    className={`px-3 py-1 rounded text-sm
-                                                        ${task.status === 3
-                                                            ? "bg-gray-400 text-gray-200"
-                                                            : "bg-blue-700 text-white hover:bg-blue-800"}
-                                                    `}
-                                                    disabled={task.status === 3}
-                                                    onClick={e => {
-                                                        e.stopPropagation();
-                                                        setEditTask({ id: task.id, title: task.title, description: task.description });
-                                                    }}
-                                                    title="Edit"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
-                                                    onClick={e => {
-                                                        e.stopPropagation();
-                                                        setDeleteTaskId(task.id); // <-- Open the modal instead of deleting immediately
-                                                    }}
-                                                    title="Delete">
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                        + Add New Task
+                    </button>
                 </div>
-            ) : (
-                <div className="text-gray-500 text-center mt-8">No tasks found for this job.</div>
-            )}
+                {jobResponse?.tasks && jobResponse.tasks.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table
+                            className="min-w-full rounded-xl border-separate"
+                            style={{
+                                background: 'var(--color-white-1)',
+                                borderCollapse: 'separate',
+                                borderSpacing: 0,
+                            }}
+                        >
+                            <thead>
+                                <tr style={{ background: 'var(--nav-background)' }}>
+                                    <th className="px-4 py-2 border-b text-white" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopLeftRadius: '0.75rem' }}>Status</th>
+                                    <th className="px-4 py-2 border-b text-white" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Title</th>
+                                    <th className="px-4 py-2 border-b text-white" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Description</th>
+                                    <th className="px-4 py-2 border-b text-white" style={{ borderColor: 'var(--color-grey-blue-1)' }}>Created At</th>
+                                    <th className="px-4 py-2 border-b text-white" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopRightRadius: '0.75rem' }}>Options</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {jobResponse.tasks.map((task, idx) => {
+                                    const isExpanded = expandedTaskId === task.id;
+                                    const isLastRow = idx === jobResponse.tasks!.length - 1;
+                                    return (
+                                        <tr
+                                            key={task.id}
+                                            className="hover:bg-gray-50 cursor-pointer row-bg"
+                                            onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
+                                        >
+                                            <td
+                                                className="px-4 py-2 border-b row-bg"
+                                                style={{
+                                                    borderColor: 'var(--color-grey-blue-1)',
+                                                    ...(isLastRow && { borderBottomLeftRadius: '0.75rem' }),
+                                                }}
+                                            >
+                                                {TaskItemStatusLabels[task.status] ?? task.status}
+                                            </td>
+                                            <td className="px-4 py-2 border-b row-bg" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                                {task.title}
+                                            </td>
+                                            <td
+                                                className="px-4 py-2 border-b row-bg"
+                                                style={{
+                                                    borderColor: 'var(--color-grey-blue-1)',
+                                                    maxWidth: '500px',
+                                                    width: '500px',
+                                                    overflow: isExpanded ? 'visible' : 'hidden',
+                                                    textOverflow: isExpanded ? 'unset' : 'ellipsis',
+                                                    whiteSpace: isExpanded ? 'normal' : 'nowrap',
+                                                    overflowWrap: isExpanded ? 'break-word' : 'normal',
+                                                    wordBreak: isExpanded ? 'break-word' : 'normal',
+                                                }}
+                                                title={!isExpanded ? task.description : undefined}
+                                            >
+                                                {task.description}
+                                            </td>
+                                            <td className="px-4 py-2 border-b row-bg" style={{ borderColor: 'var(--color-grey-blue-1)' }}>
+                                                {new Date(task.createdAtUtc).toLocaleString('en-GB', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric',
+                                                    hour: 'numeric',
+                                                    minute: '2-digit',
+                                                    hour12: false
+                                                }).replace(/\//g, '-')}
+                                            </td>
+                                            <td
+                                                className="py-2 px-4 border-b"
+                                                style={{
+                                                    borderColor: 'var(--color-grey-blue-1)',
+                                                    ...(isLastRow && { borderBottomRightRadius: '0.75rem' }),
+                                                }}
+                                            >
+                                                <div className="flex gap-2 justify-center">
+                                                    <select
+                                                        className="border rounded px-2 py-1 text-sm"
+                                                        value={task.status}
+                                                        disabled={task.status === 3}
+                                                        onClick={e => e.stopPropagation()}
+                                                        onChange={async (e) => {
+                                                            const newStatus = e.target.value;
+                                                            const auth = getAuth();
+                                                            const token = auth.token;
+
+                                                            await api.patch(`tasks/${task.id}/status`, { status: newStatus }, {
+                                                                headers: { Authorization: `Bearer ${token}` }
+                                                            });
+                                                            fetchJobs()
+                                                        }}>
+                                                        {Object.entries(TaskItemStatusLabels)
+                                                            .filter(([status]) => status !== "0")
+                                                            .map(([status, label]) => (
+                                                                <option key={status} value={status}>{label}</option>
+                                                            ))}
+                                                    </select>
+                                                    <button
+                                                        className={`px-3 py-1 rounded text-sm
+                                                            ${task.status === 3
+                                                                ? "bg-gray-400 text-gray-200"
+                                                                : "bg-blue-700 text-white hover:bg-blue-800"}
+                                                        `}
+                                                        disabled={task.status === 3}
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            setEditTask({ id: task.id, title: task.title, description: task.description });
+                                                        }}
+                                                        title="Edit"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            setDeleteTaskId(task.id);
+                                                        }}
+                                                        title="Delete">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="text-gray-500 text-center mt-8">No tasks found for this job.</div>
+                )}
+            </div>
             <EditTaskModal
                 editTask={editTask}
                 setEditTask={setEditTask}

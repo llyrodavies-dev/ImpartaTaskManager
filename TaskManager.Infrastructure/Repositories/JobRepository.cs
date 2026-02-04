@@ -33,6 +33,7 @@ namespace TaskManager.Infrastructure.Repositories
         {
             var query = _dbContext.Jobs
                 .AsNoTracking()
+                .Include(j => j.Tasks)
                 .Where(j => j.UserId == userId);
 
             var totalCount = await query.CountAsync(cancellationToken);

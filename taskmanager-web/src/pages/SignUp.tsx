@@ -23,11 +23,8 @@ export default function SignUp() {
         }
 
         const registerCommand: RegisterCommand = { displayName, email, password };
-        console.log('Sign up attempt:', registerCommand);
         const result = await api.post('auth/register', registerCommand);
-        console.log('Sign up response:', result);
         if (handleApiResponse(result)) {
-            console.error('Sign up failed:', result);
             return;
         }
 
@@ -39,7 +36,9 @@ export default function SignUp() {
     return (
         <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - var(--navbar-height))'}}>
             <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-                <h1 className="text-3xl font-bold text-center mb-2 text-blue-800">Job Manager</h1>
+                {/* Logo and App Name */}
+                <img src="/logo.png" alt="Logo" className="mx-auto mb-4 w-24 h-24" />
+                <h1 className="text-3xl font-bold text-center mb-2 main-text" >Task Manager</h1>
                 <h2 className="text-lg text-gray-700 text-center mb-6">Create your account</h2>
                 {errorTitle && (
                     <div className="mb-4 text-red-600 text-center font-semibold">{errorTitle}</div>
@@ -98,7 +97,7 @@ export default function SignUp() {
                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
                     </div>
-                    <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 font-semibold transition">
+                    <button type="submit" className="w-full py-2 rounded font-semibold transition button-signup">
                         Sign Up
                     </button>
                 </form>

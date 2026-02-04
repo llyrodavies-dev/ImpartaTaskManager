@@ -17,7 +17,7 @@ export default function EditTaskModal({
         <div className="fixed inset-0 flex items-center justify-center z-50"
             style={{ background: 'rgba(0,0,0,0.4)' }} >
             <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-                <h3 className="text-xl font-bold mb-4 text-blue-800">
+                <h3 className="text-xl font-bold mb-4 main-text">
                     {editTask.id ? 'Edit Task' : 'Create Task'}
                 </h3>
                 <label className="block mb-2 text-sm font-medium text-gray-700">Title</label>

@@ -80,12 +80,13 @@ export default function Dashboard() {
 
     return (
         <div className="p-4 md:p-8">
-            <h1 className="text-3xl font-bold mb-8 text-center text-blue-800">Dashboard</h1>
             <div className="flex flex-col md:flex-row gap-8">
                 {/* Profile & Jobs/Tasks Summary */}
                 <div className="md:w-1/3 flex flex-col items-center md:items-start">
                     {/* Combined Jobs & Tasks Card */}
                     <div className="w-full bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col gap-6">
+                        {/* Dashboard Title */}
+                        <h1 className="text-3xl font-bold mb-4 text-blue-800 main-text text-left">Dashboard</h1>
                         {/* Row 1: Profile Image & User Info */}
                         <div className="flex items-center gap-6 mb-2">
                             {/* Profile Image with button */}
@@ -95,10 +96,10 @@ export default function Dashboard() {
                                         src={profileImageUrl}
                                         alt="Profile"
                                         className="w-50 h-50 object-cover rounded-3xl border-4 shadow-lg"
-                                        style={{borderColor: "var(--color-navbar)"}}
+                                        style={{ borderColor: "var(--color-navbar)" }}
                                     />
                                 ) : (
-                                    <div className="w-50 h-50 rounded-3xl bg-gray-200 flex items-center justify-center text-gray-500 text-xl border-4 shadow-lg"  style={{borderColor: "var(--color-navbar)"}}>
+                                    <div className="w-50 h-50 rounded-3xl bg-gray-200 flex items-center justify-center text-gray-500 text-xl border-4 shadow-lg" style={{ borderColor: "var(--color-navbar)" }}>
                                         No Image
                                     </div>
                                 )}
@@ -123,7 +124,7 @@ export default function Dashboard() {
                             {/* User Info */}
                             {userInfo && (
                                 <div>
-                                    <div className="text-lg font-semibold text-blue-900 text-left">Name : {userInfo.displayName}</div>
+                                    <div className="main-text text-lg font-semibold text-blue-900 text-left">Name : {userInfo.displayName}</div>
                                     <div className="text-sm text-gray-600 text-left">Email : {userInfo.email}</div>
                                 </div>
                             )}
@@ -227,7 +228,7 @@ export default function Dashboard() {
 
                     <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
                         <h3 className="text-md font-bold text-red-700 mb-4 text-left">Blocked Tasks</h3>
-                        {tasksResponse && tasksResponse.items.filter(task => task.status === 4).length > 0 ? (
+                        {tasksResponse && tasksResponse.items.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table
                                     className="min-w-full rounded-xl border-separate"
@@ -235,14 +236,13 @@ export default function Dashboard() {
                                         background: 'var(--color-white-1)',
                                         borderCollapse: 'separate',
                                         borderSpacing: 0,
-                                    }}
-                                >
+                                    }}>
                                     <thead>
-                                        <tr style={{ background: '#e3eaf2' }}>
-                                            <th className="px-4 py-2 font-semibold border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', borderTopLeftRadius: '0.75rem', width: '120px' }}>Status</th>
-                                            <th className="px-4 py-2 font-semibold border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', width: '180px' }}>Title</th>
-                                            <th className="px-4 py-2 font-semibold border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', maxWidth: '500px', width: '500px' }}>Description</th>
-                                            <th className="px-4 py-2 font-semibold border-b text-blue-800" style={{ borderColor: 'var(--color-grey-blue-1)', width: '180px' }}>Created At</th>
+                                        <tr style={{ background: 'var(--nav-background)' }}>
+                                            <th className="px-4 py-2 font-semibold border-b text-blue-800 text-white" style={{  borderTopLeftRadius: '0.75rem', width: '120px' }}>Status</th>
+                                            <th className="px-4 py-2 font-semibold border-b text-blue-800 text-white" style={{  width: '180px' }}>Title</th>
+                                            <th className="px-4 py-2 font-semibold border-b text-blue-800 text-white" style={{  maxWidth: '500px', width: '500px' }}>Description</th>
+                                            <th className="px-4 py-2 font-semibold border-b text-blue-800 text-white" style={{  borderTopRightRadius: '0.75rem', width: '180px' }}>Created At</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -253,7 +253,7 @@ export default function Dashboard() {
                                                 return (
                                                     <tr key={task.id} className="hover:bg-gray-50">
                                                         <td
-                                                            className="px-4 py-2 border-b"
+                                                            className="px-4 py-2 border-b row-bg"
                                                             style={{
                                                                 borderColor: 'var(--color-grey-blue-1)',
                                                                 ...(isLastRow && { borderBottomLeftRadius: '0.75rem' }),
@@ -262,11 +262,11 @@ export default function Dashboard() {
                                                         >
                                                             Blocked
                                                         </td>
-                                                        <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)', width: '180px' }}>
+                                                        <td className="px-4 py-2 border-b row-bg" style={{ borderColor: 'var(--color-grey-blue-1)', width: '180px' }}>
                                                             {task.title}
                                                         </td>
                                                         <td
-                                                            className="px-4 py-2 border-b"
+                                                            className="px-4 py-2 border-b row-bg"
                                                             style={{
                                                                 borderColor: 'var(--color-grey-blue-1)',
                                                                 maxWidth: '500px',
@@ -279,7 +279,10 @@ export default function Dashboard() {
                                                         >
                                                             {task.description}
                                                         </td>
-                                                        <td className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-grey-blue-1)', width: '180px' }}>
+                                                        <td className="px-4 py-2 border-b row-bg" 
+                                                        style={{ borderColor: 'var(--color-grey-blue-1)', 
+                                                        ...(isLastRow && { borderBottomRightRadius: '0.75rem' }),
+                                                        width: '180px' }}>
                                                             {new Date(task.createdAtUtc).toLocaleString('en-GB', {
                                                                 day: '2-digit',
                                                                 month: '2-digit',

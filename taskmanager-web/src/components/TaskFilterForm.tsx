@@ -46,9 +46,9 @@ export default function TaskFilterForm({ fieldOptions, fieldOperators, filters, 
     };
 
     return (
-        <div className="mb-6 bg-white rounded-xl shadow p-6 w-fit" 
+        <div className="mb-6 rounded-xl shadow p-6 w-fit" 
             style={{ 
-                background: 'var(--color-white-1)', 
+                background: 'var(--btn-edit-hover)', 
                 marginLeft: 0, 
                 }}>
             <div className="flex flex-wrap items-end gap-4">

@@ -1,7 +1,7 @@
 import type { FilterRequest } from './FilterRequest';
 
 export interface TasksQuery {
-    page?: number;
+    pageNumber?: number;
     pageSize?: number;
     sortColumn?: string;
     isDescending?: boolean;

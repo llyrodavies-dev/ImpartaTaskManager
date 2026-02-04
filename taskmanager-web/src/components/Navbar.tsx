@@ -14,17 +14,20 @@ export default function Navbar() {
 
   return (
     <nav style={{ 
-      backgroundColor: 'var(--color-navbar)', 
+      backgroundColor: 'var(--nav-background)', 
       height: 'var(--navbar-height)', 
       display: 'flex', 
       alignItems: 'center', 
-      padding: '0 1rem' ,
+      padding: '0 1rem', 
       justifyContent: 'space-between',
-      paddingLeft:'60px',
+      paddingLeft:'20px',
       paddingRight:'60px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Link to="/" className="text-white mr-4 hover:text-blue-300">Home</Link>
+      <Link to="/" className="flex items-center mr-6 group">
+        <img src="/logo.png" alt="Logo" className="w-8 h-8 mr-2" />
+        <span className="text-xl font-bold group-hover:text-blue-300 transition main-text-light">Task Manager</span>
+      </Link>
       {isLoggedIn && (
         <>
           <Link to="/dashboard" className="text-white mr-4 hover:text-blue-300">Dashboard</Link>

@@ -14,6 +14,8 @@ namespace TaskManager.Application.Features.Jobs.DTOs
         public DateTime? ModifiedAtUtc { get; set; }
         public string? ModifiedBy { get; set; }
 
+        public int TasksCount { get; set; }
+
         // Mapping methods
         public static JobDto FromDomain(Job job)
         {
@@ -25,7 +27,8 @@ namespace TaskManager.Application.Features.Jobs.DTOs
                 CreatedAtUtc = job.CreatedAtUtc,
                 CreatedBy = job.CreatedBy,
                 ModifiedAtUtc = job.ModifiedAtUtc,
-                ModifiedBy = job.ModifiedBy
+                ModifiedBy = job.ModifiedBy,
+                TasksCount = job.Tasks.Where(x=>x.Status!= TaskItemStatus.Completed).Count()
             };
         }
 
